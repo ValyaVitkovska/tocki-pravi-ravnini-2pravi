@@ -25,9 +25,6 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Marked.js & DOMPurify for secure Markdown parsing from LLM -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.8/purify.min.js"></script>
     <!-- MathJax for LaTeX parsing -->
     <script>
         window.MathJax = {
@@ -42,6 +39,8 @@
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600&display=swap');
+
         body {
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             overflow-x: hidden;
@@ -81,7 +80,7 @@
 
         .canvas-container {
             width: 100%; height: 350px; border-radius: 0.5rem; overflow: hidden;
-            background-color: #f8fafc; /* Светъл фон за добър контраст */
+            background-color: #f8fafc; 
             position: relative; cursor: grab;
             box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.1);
             border: 1px solid #e2e8f0;
@@ -93,7 +92,7 @@
         }
 
         html.dark .canvas-container {
-            background-color: #1e293b; /* Специфичен тъмен фон, открояващ тъмни и светли линии */
+            background-color: #1e293b;
             box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.5);
             border-color: #334155;
         }
@@ -119,7 +118,6 @@
         .btn-3d:has(input:checked) { background-color: #eff6ff; }
         html.dark .btn-3d:has(input:checked) { background-color: rgba(59, 130, 246, 0.15); }
 
-        /* Theming for static blocks & markdown */
         html.dark .bg-gray-50 { background-color: #1e293b; border-color: #334155; }
         html.dark .text-gray-900 { color: #f8fafc; }
         html.dark .bg-white { background-color: #0f172a; border-color: #334155;}
@@ -127,32 +125,12 @@
         html.dark .bg-indigo-50 { background-color: rgba(99, 102, 241, 0.1); border-color: rgba(99, 102, 241, 0.2); }
         html.dark .bg-purple-50 { background-color: rgba(168, 85, 247, 0.1); border-color: rgba(168, 85, 247, 0.2); }
 
-        /* Custom Quiz Button styling */
         .quiz-btn.correct { background-color: #10b981; color: white; border-color: #059669; }
         .quiz-btn.wrong { background-color: #ef4444; color: white; border-color: #b91c1c; }
-
-        /* Loading Animation */
-        .typing-indicator span {
-            display: inline-block; width: 6px; height: 6px; background-color: currentColor; border-radius: 50%;
-            animation: typing 1.4s infinite both; margin: 0 2px;
-        }
-        .typing-indicator span:nth-child(1) { animation-delay: 0s; }
-        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-        @keyframes typing {
-            0%, 80%, 100% { transform: scale(0); }
-            40% { transform: scale(1); }
-        }
-
-        /* Markdown Styles in AI Chat */
-        .markdown-body p { margin-bottom: 0.5rem; }
-        .markdown-body ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 0.5rem; }
-        .markdown-body strong { font-weight: bold; }
     </style>
 </head>
 <body class="text-gray-800 dark:text-gray-100 antialiased relative min-h-screen">
 
-    <!-- Geometric Background -->
     <div class="bg-main"></div>
     <div class="float-shape float-shape-1"></div>
     <div class="float-shape float-shape-2"></div>
@@ -179,10 +157,10 @@
         <!-- Credits Image -->
         <div class="text-center mb-8">
             <img src="TPR.png" alt="Точки, прави и равнини в пространството" class="mx-auto rounded-xl shadow-lg max-h-[28rem] w-full max-w-4xl object-cover mb-4 border-2 border-white dark:border-slate-700" onerror="this.style.display='none';">
-            <p class="text-base text-gray-700 dark:text-gray-300 font-medium bg-white/50 dark:bg-slate-900/50 inline-block px-4 py-2 rounded-full backdrop-blur-sm border border-gray-200 dark:border-slate-700">Идея и педагогически решения: Валя Витковска &nbsp;|&nbsp; Създаден с Gemini и ChatGPT</p>
+            <p class="text-base text-gray-700 dark:text-gray-300 font-medium bg-white/50 dark:bg-slate-900/50 inline-block px-4 py-2 rounded-full backdrop-blur-sm border border-gray-200 dark:border-slate-700">Идея и педагогически решения: Валя Витковска &nbsp;|&nbsp; Създаден с AI</p>
         </div>
 
-        <!-- SECTION I: Basic Objects -->
+        <!-- SECTION I -->
         <section class="glass-card">
             <h2 class="text-2xl font-bold mb-4 accent-gradient border-b border-gray-200 dark:border-slate-700 pb-2">I. Основни понятия и обекти в пространството</h2>
             <p class="mb-6 text-lg text-gray-800 dark:text-gray-200 font-medium">Изграждането на стереометрията се извършва чрез аксиоматичен подход. Въвеждат се първични понятия (обекти), за които не се дават строги определения, а се описват чрез техните свойства и физически модели.</p>
@@ -190,7 +168,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center mb-6">
                 <div class="flex flex-col">
                     <div id="basic-objects-canvas" class="canvas-container shadow-inner">
-                        <div class="canvas-overlay"><i data-lucide="rotate-3d" class="inline w-4 h-4 mr-1"></i> Завъртете за 3D изглед (Общ изглед)</div>
+                        <div class="canvas-overlay"><i data-lucide="pen-tool" class="inline w-4 h-4 mr-1"></i> Начертано на живо</div>
                     </div>
                 </div>
 
@@ -202,7 +180,6 @@
                         <div>
                             <h3 class="font-bold text-xl text-gray-900 dark:text-white mb-1">Точки</h3>
                             <p class="text-base text-gray-800 dark:text-gray-200 mb-1">Означават се с главни латински букви: <span class="font-mono text-blue-700 dark:text-blue-400 font-bold bg-white dark:bg-slate-800 p-1 rounded border border-gray-300 dark:border-slate-600 inline-block ml-1">A, B, C...</span></p>
-                            <p class="text-sm text-blue-600 dark:text-blue-400 font-medium italic"><i data-lucide="sparkles" class="inline w-3 h-3 mr-1"></i>Модел от реалността: Връх на игла или прашинка във въздуха.</p>
                         </div>
                     </div>
 
@@ -213,7 +190,6 @@
                         <div>
                             <h3 class="font-bold text-xl text-gray-900 dark:text-white mb-1">Прави</h3>
                             <p class="text-base text-gray-800 dark:text-gray-200 mb-1">Означават се с малки букви: <span class="font-mono text-indigo-700 dark:text-indigo-400 font-bold bg-white dark:bg-slate-800 p-1 rounded border border-gray-300 dark:border-slate-600 inline-block ml-1">a, b, c...</span></p>
-                            <p class="text-sm text-indigo-600 dark:text-indigo-400 font-medium italic"><i data-lucide="sparkles" class="inline w-3 h-3 mr-1"></i>Модел от реалността: Опънат тънък конец или лазерен лъч (безкраен).</p>
                         </div>
                     </div>
 
@@ -224,7 +200,6 @@
                         <div>
                             <h3 class="font-bold text-xl text-gray-900 dark:text-white mb-1">Равнини</h3>
                             <p class="text-base text-gray-800 dark:text-gray-200 mb-1">Означават се с гръцки букви: <span class="font-mono text-purple-700 dark:text-purple-400 font-bold bg-white dark:bg-slate-800 p-1 rounded border border-gray-300 dark:border-slate-600 inline-block ml-1">α, β, γ...</span></p>
-                            <p class="text-sm text-purple-600 dark:text-purple-400 font-medium italic"><i data-lucide="sparkles" class="inline w-3 h-3 mr-1"></i>Модел от реалността: Повърхността на вода в спокойно езеро.</p>
                         </div>
                     </div>
                 </div>
@@ -232,7 +207,7 @@
 
             <div class="mt-12 border-t border-gray-300 dark:border-slate-600 pt-8">
                 <h3 class="text-xl font-bold mb-6 text-gray-900 dark:text-white flex items-center gap-2">
-                    <i data-lucide="pen-tool" class="w-6 h-6 text-blue-600 dark:text-blue-400"></i>
+                    <i data-lucide="mouse-pointer-click" class="w-6 h-6 text-blue-600 dark:text-blue-400"></i>
                     Математически означения и принадлежност
                 </h3>
 
@@ -283,7 +258,7 @@
 
                     <div class="flex flex-col">
                         <div id="notation-canvas" class="canvas-container">
-                            <div class="canvas-overlay"><i data-lucide="rotate-3d" class="inline w-4 h-4 mr-1"></i> Динамичен чертеж</div>
+                            <div class="canvas-overlay"><i data-lucide="rotate-3d" class="inline w-4 h-4 mr-1"></i> Анимиран чертеж</div>
                         </div>
                     </div>
                 </div>
@@ -306,7 +281,7 @@
             </div>
         </section>
 
-        <!-- SECTION II: Axioms -->
+        <!-- SECTION II -->
         <section class="glass-card">
             <h2 class="text-2xl font-bold mb-4 accent-gradient border-b border-gray-200 dark:border-slate-700 pb-2">II. Аксиоми в стереометрията</h2>
 
@@ -351,11 +326,11 @@
 
                 <div class="flex flex-col">
                     <div id="axioms-canvas" class="canvas-container">
-                        <div class="canvas-overlay"><i data-lucide="rotate-3d" class="inline w-4 h-4 mr-1"></i> Завъртете за 3D изглед</div>
+                        <div class="canvas-overlay"><i data-lucide="rotate-3d" class="inline w-4 h-4 mr-1"></i> Анимиран чертеж</div>
                     </div>
                 </div>
             </div>
-
+            
             <div class="mt-8 bg-indigo-50 dark:bg-slate-800/80 rounded-xl p-5 border border-indigo-200 dark:border-slate-600 shadow-sm relative">
                 <div class="flex flex-wrap justify-between items-center mb-4 gap-4">
                         <h4 class="font-bold text-lg text-indigo-800 dark:text-indigo-300 flex items-center gap-2"><i data-lucide="help-circle" class="w-5 h-5"></i> Бърза проверка</h4>
@@ -373,14 +348,14 @@
             </div>
         </section>
 
-        <!-- SECTION III: Determining a plane -->
+        <!-- SECTION III -->
         <section class="glass-card">
             <h2 class="text-2xl font-bold mb-4 accent-gradient border-b border-gray-200 dark:border-slate-700 pb-2">III. Основни построения: Определяне на равнина</h2>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
                 <div class="order-2 lg:order-1 flex flex-col">
                     <div id="plane-def-canvas" class="canvas-container">
-                        <div class="canvas-overlay"><i data-lucide="rotate-3d" class="inline w-4 h-4 mr-1"></i> Завъртете за 3D изглед</div>
+                        <div class="canvas-overlay"><i data-lucide="rotate-3d" class="inline w-4 h-4 mr-1"></i> Анимиран чертеж</div>
                     </div>
                 </div>
 
@@ -412,7 +387,7 @@
             </div>
         </section>
 
-        <!-- SECTION IV: Mutual Positions -->
+        <!-- SECTION IV -->
         <section class="glass-card">
             <h2 class="text-2xl font-bold mb-4 accent-gradient border-b border-gray-200 dark:border-slate-700 pb-2">IV. Взаимно положение на две прави</h2>
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
@@ -456,13 +431,13 @@
 
                 <div class="flex flex-col">
                     <div id="position-canvas" class="canvas-container">
-                        <div class="canvas-overlay"><i data-lucide="rotate-3d" class="inline w-4 h-4 mr-1"></i> Завъртете за 3D изглед</div>
+                        <div class="canvas-overlay"><i data-lucide="rotate-3d" class="inline w-4 h-4 mr-1"></i> Анимиран чертеж</div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- SECTION V: Angle between skew lines -->
+        <!-- SECTION V -->
         <section class="glass-card">
             <h2 class="text-2xl font-bold mb-4 accent-gradient border-b border-gray-200 dark:border-slate-700 pb-2">V. Ъгъл между кръстосани прави</h2>
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
@@ -506,13 +481,13 @@
 
                 <div class="flex flex-col">
                     <div id="angle-skew-canvas" class="canvas-container">
-                        <div class="canvas-overlay"><i data-lucide="rotate-3d" class="inline w-4 h-4 mr-1"></i> Завъртете за 3D изглед</div>
+                        <div class="canvas-overlay"><i data-lucide="rotate-3d" class="inline w-4 h-4 mr-1"></i> Анимиран чертеж</div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- SECTION VI: Parallel Lines -->
+        <!-- SECTION VI -->
         <section class="glass-card relative">
             <div class="flex flex-wrap justify-between items-center mb-4 gap-4 border-b border-gray-200 dark:border-slate-700 pb-2">
                 <h2 class="text-2xl font-bold accent-gradient m-0">VI. Успоредни прави: Свойства и Теореми</h2>
@@ -551,18 +526,17 @@
 
                 <div class="flex flex-col">
                     <div id="theorems-canvas" class="canvas-container">
-                        <div class="canvas-overlay"><i data-lucide="rotate-3d" class="inline w-4 h-4 mr-1"></i> Завъртете за 3D изглед</div>
+                        <div class="canvas-overlay"><i data-lucide="rotate-3d" class="inline w-4 h-4 mr-1"></i> Анимиран чертеж</div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- SECTION VII: Practical Tasks -->
+        <!-- SECTION VII: Tasks -->
         <section class="glass-card">
             <h2 class="text-2xl font-bold mb-6 accent-gradient border-b border-gray-200 dark:border-slate-700 pb-2">VII. Практически задачи с динамични чертежи</h2>
             
             <div class="space-y-6">
-                
                 <!-- Task 1 -->
                 <div class="bg-white/50 dark:bg-slate-800/50 rounded-xl p-5 border border-gray-200 dark:border-slate-700">
                     <h3 class="font-bold text-lg text-blue-700 dark:text-blue-400 mb-2">Задача 1</h3>
@@ -585,7 +559,7 @@
                             </div>
                         </div>
                         <div class="canvas-container" style="height: 280px;" id="task1-canvas">
-                            <div class="canvas-overlay"><i data-lucide="rotate-3d" class="inline w-4 h-4 mr-1"></i> 3D Модел</div>
+                            <div class="canvas-overlay"><i data-lucide="rotate-3d" class="inline w-4 h-4 mr-1"></i> Анимиран 3D Модел</div>
                         </div>
                     </div>
                 </div>
@@ -608,13 +582,11 @@
                             </div>
                             <div class="bg-blue-50 dark:bg-blue-900/20 p-3 rounded border border-blue-200 dark:border-blue-800 text-sm text-gray-800 dark:text-gray-200">
                                 <i data-lucide="info" class="w-4 h-4 inline mr-1 text-blue-600 dark:text-blue-400"></i>
-                                <strong>Отговор:</strong> 
-                                Ако правите са компланарни (лежат в една равнина), те определят <strong>1 равнина</strong>. 
-                                Ако не са, всеки две прави определят по една равнина, тоест общо <strong>3 равнини</strong>.
+                                <strong>Отговор:</strong> Ако правите са компланарни, те определят <strong>1 равнина</strong>. Ако не са, всеки две прави определят по една равнина, тоест общо <strong>3 равнини</strong>.
                             </div>
                         </div>
                         <div class="canvas-container" style="height: 280px;" id="task2-canvas">
-                            <div class="canvas-overlay"><i data-lucide="rotate-3d" class="inline w-4 h-4 mr-1"></i> 3D Модел</div>
+                            <div class="canvas-overlay"><i data-lucide="rotate-3d" class="inline w-4 h-4 mr-1"></i> Анимиран 3D Модел</div>
                         </div>
                     </div>
                 </div>
@@ -641,7 +613,7 @@
                             </div>
                         </div>
                         <div class="canvas-container" style="height: 280px;" id="task3-canvas">
-                            <div class="canvas-overlay"><i data-lucide="rotate-3d" class="inline w-4 h-4 mr-1"></i> 3D Модел</div>
+                            <div class="canvas-overlay"><i data-lucide="rotate-3d" class="inline w-4 h-4 mr-1"></i> Анимиран 3D Модел</div>
                         </div>
                     </div>
                 </div>
@@ -672,7 +644,7 @@
                             </div>
                         </div>
                         <div class="canvas-container" style="height: 280px;" id="task4-canvas">
-                            <div class="canvas-overlay"><i data-lucide="rotate-3d" class="inline w-4 h-4 mr-1"></i> 3D Модел</div>
+                            <div class="canvas-overlay"><i data-lucide="rotate-3d" class="inline w-4 h-4 mr-1"></i> Анимиран 3D Модел</div>
                         </div>
                     </div>
                 </div>
@@ -706,7 +678,7 @@
                             </div>
                         </div>
                         <div class="canvas-container" style="height: 280px;" id="task5-canvas">
-                            <div class="canvas-overlay"><i data-lucide="rotate-3d" class="inline w-4 h-4 mr-1"></i> 3D Модел</div>
+                            <div class="canvas-overlay"><i data-lucide="rotate-3d" class="inline w-4 h-4 mr-1"></i> Анимиран 3D Модел</div>
                         </div>
                     </div>
                 </div>
@@ -737,7 +709,7 @@
                             </div>
                         </div>
                         <div class="canvas-container" style="height: 280px;" id="task6-canvas">
-                            <div class="canvas-overlay"><i data-lucide="rotate-3d" class="inline w-4 h-4 mr-1"></i> 3D Модел</div>
+                            <div class="canvas-overlay"><i data-lucide="rotate-3d" class="inline w-4 h-4 mr-1"></i> Анимиран 3D Модел</div>
                         </div>
                     </div>
                 </div>
@@ -766,7 +738,7 @@
                             </div>
                         </div>
                         <div class="canvas-container" style="height: 280px;" id="task7-canvas">
-                            <div class="canvas-overlay"><i data-lucide="rotate-3d" class="inline w-4 h-4 mr-1"></i> 3D Модел</div>
+                            <div class="canvas-overlay"><i data-lucide="rotate-3d" class="inline w-4 h-4 mr-1"></i> Анимиран 3D Модел</div>
                         </div>
                     </div>
                 </div>
@@ -812,10 +784,9 @@
                 
                 buttons.forEach(btn => {
                     btn.addEventListener('click', function() {
-                        // Reset all buttons in this group
                         buttons.forEach(b => {
                             b.classList.remove('correct', 'wrong');
-                            b.disabled = true; // Disable after one click to prevent guessing spam
+                            b.disabled = true;
                         });
                         
                         const isCorrect = this.getAttribute('data-correct') === 'true';
@@ -825,7 +796,6 @@
                             feedback.innerHTML = '<span class="text-green-600 dark:text-green-400"><i data-lucide="check-circle" class="inline w-4 h-4 mr-1"></i> Правилно!</span>';
                         } else {
                             this.classList.add('wrong');
-                            // Highlight the correct one
                             group.querySelector('[data-correct="true"]').classList.add('correct');
                             feedback.innerHTML = '<span class="text-red-600 dark:text-red-400"><i data-lucide="x-circle" class="inline w-4 h-4 mr-1"></i> Грешно. Вижте верния отговор.</span>';
                         }
@@ -837,15 +807,14 @@
             });
         }
 
-        // --- 3. Three.js Setup & Helpers ---
+        // --- 3. Three.js Setup & Animation Helpers ---
         const scenes = [];
+        let globalClock = new THREE.Clock();
 
         function createBaseScene(containerId) {
             const container = document.getElementById(containerId);
-            if (!container) {
-                console.error("Липсва контейнер с ID: " + containerId);
-                return null;
-            }
+            if (!container) return null;
+            
             const scene = new THREE.Scene();
             const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
             camera.position.set(4, 4, 6);
@@ -859,110 +828,107 @@
             controls.enableDamping = true;
             controls.dampingFactor = 0.05;
 
-            // Lighting
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
             scene.add(ambientLight);
-            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.5);
             dirLight.position.set(5, 10, 7);
             scene.add(dirLight);
 
             const mainGroup = new THREE.Group();
             scene.add(mainGroup);
 
-            const sceneData = { scene, camera, renderer, controls, container, mainGroup };
+            const sceneData = { scene, camera, renderer, controls, container, mainGroup, time: 0 };
             scenes.push(sceneData);
             return sceneData;
         }
 
-        // Geometry Helpers
-        const matPoint = new THREE.MeshPhongMaterial({ color: 0xef4444, shininess: 100 }); // Red
-        const matLine = new THREE.MeshPhongMaterial({ color: 0x3b82f6, shininess: 80 });  // Blue
-        const matLineAlt = new THREE.MeshPhongMaterial({ color: 0x10b981, shininess: 80 }); // Green
-        const matPlane = new THREE.MeshPhysicalMaterial({ 
-            color: 0xa855f7, // Purple
-            transparent: true, 
-            opacity: 0.4, 
-            side: THREE.DoubleSide,
-            roughness: 0.1,
-            metalness: 0.1,
-            clearcoat: 1.0
+        // --- Материалите тип "Тебешир/Маркер" ---
+        // Използваме MeshPhongMaterial с shininess: 0 за матов ефект
+        const matPoint = new THREE.MeshPhongMaterial({ color: 0xef4444, shininess: 0 }); // Red
+        const matLine = new THREE.MeshPhongMaterial({ color: 0x3b82f6, shininess: 0 });  // Blue
+        const matLineAlt = new THREE.MeshPhongMaterial({ color: 0x10b981, shininess: 0 }); // Green
+        
+        const matBaseLine = new THREE.MeshPhongMaterial({ color: 0x94a3b8, shininess: 0 });
+        const matHigh1 = new THREE.MeshPhongMaterial({ color: 0xef4444, shininess: 0 }); 
+        const matHigh2 = new THREE.MeshPhongMaterial({ color: 0x10b981, shininess: 0 }); 
+        const matHigh3 = new THREE.MeshPhongMaterial({ color: 0xeab308, shininess: 0 }); 
+
+        const baseMatPlane = new THREE.MeshPhysicalMaterial({ 
+            color: 0xa855f7, transparent: true, opacity: 0.4, side: THREE.DoubleSide, roughness: 1.0, metalness: 0
         });
 
-        // Global materials for highlights and tasks
-        const matBaseLine = new THREE.MeshPhongMaterial({ color: 0x94a3b8 });
-        const matHigh1 = new THREE.MeshPhongMaterial({ color: 0xef4444 }); // red
-        const matHigh2 = new THREE.MeshPhongMaterial({ color: 0x10b981 }); // green
-        const matHigh3 = new THREE.MeshPhongMaterial({ color: 0xeab308 }); // yellow
-        const matTransPlane = new THREE.MeshPhysicalMaterial({ color: 0xa855f7, transparent: true, opacity: 0.3, side: THREE.DoubleSide });
-
-        function createPoint(x, y, z) {
-            const geo = new THREE.SphereGeometry(0.12, 32, 32);
+        // --- Функции за изграждане с поддръжка на анимация ---
+        
+        function createPoint(x, y, z, delay = 0) {
+            const geo = new THREE.SphereGeometry(0.12, 16, 16);
             const mesh = new THREE.Mesh(geo, matPoint);
             mesh.position.set(x, y, z);
+            mesh.scale.setScalar(0.001); // Стартираме скрити
+            mesh.userData.anim = { type: 'pop', val: 0, target: 1, delay: delay, speed: 4 }; // Speed multiplier
             return mesh;
         }
 
-        function createLine(p1, p2, material = matLine, thickness = 0.04) {
+        function createLine(p1, p2, material = matLine, thickness = 0.04, delay = 0) {
             const distance = p1.distanceTo(p2);
-            const geo = new THREE.CylinderGeometry(thickness, thickness, distance, 16);
+            const geo = new THREE.CylinderGeometry(thickness, thickness, distance, 12);
+            // Преместваме центъра в началото, за да расте от p1 към p2
+            geo.translate(0, distance / 2, 0); 
+            
             const mesh = new THREE.Mesh(geo, material);
-            const mid = p1.clone().lerp(p2, 0.5);
-            mesh.position.copy(mid);
-            mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), p2.clone().sub(p1).normalize());
-            return mesh;
+            mesh.scale.y = 0.001; 
+            mesh.userData.anim = { type: 'grow', val: 0, target: 1, delay: delay, speed: 3 }; 
+            
+            const group = new THREE.Group();
+            group.position.copy(p1);
+            group.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), p2.clone().sub(p1).normalize());
+            group.add(mesh);
+            
+            return group;
         }
 
-        function createPlane(w, h, colorHex = null) {
+        function createPlane(w, h, colorHex = null, delay = 0) {
             const geo = new THREE.PlaneGeometry(w, h);
-            const mat = colorHex ? matPlane.clone() : matPlane;
+            const mat = baseMatPlane.clone(); // Уникален за всяка равнина за индивидуална opacity
             if(colorHex) mat.color.setHex(colorHex);
+            mat.opacity = 0; // Започва скрита
             const mesh = new THREE.Mesh(geo, mat);
-            mesh.rotation.x = -Math.PI / 2; // Flat on XZ by default
+            mesh.rotation.x = -Math.PI / 2;
+            mesh.userData.anim = { type: 'fade', val: 0, target: 0.4, delay: delay, speed: 1.5 };
             return mesh;
         }
 
-        function makeTextSprite(text, scale = 1) {
+        function addLabel(grp, text, pos, offset = new THREE.Vector3(0, 0.4, 0), scale = 0.9, delay = 0) {
             const canvas = document.createElement('canvas');
-            canvas.width = 128; canvas.height = 128;
+            canvas.width = 256; canvas.height = 256;
             const ctx = canvas.getContext('2d');
-            ctx.font = "italic bold 64px 'Times New Roman', serif"; // Математически изглед
-            ctx.fillStyle = document.documentElement.classList.contains('dark') ? '#ffffff' : '#111827';
+            // Използваме ръкописен шрифт за ефекта
+            ctx.font = "italic bold 100px 'Caveat', 'Comic Sans MS', cursive, sans-serif"; 
+            ctx.fillStyle = document.documentElement.classList.contains('dark') ? '#f8fafc' : '#0f172a';
             ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-            ctx.fillText(text, 64, 64);
+            ctx.fillText(text, 128, 128);
             const texture = new THREE.CanvasTexture(canvas);
-            const mat = new THREE.SpriteMaterial({ map: texture, depthTest: false });
+            const mat = new THREE.SpriteMaterial({ map: texture, depthTest: false, transparent: true, opacity: 0 });
             const sprite = new THREE.Sprite(mat);
+            sprite.position.copy(pos).add(offset);
             sprite.scale.set(scale, scale, 1);
-            return sprite;
+            sprite.userData.anim = { type: 'fade', val: 0, target: 1, delay: delay, speed: 3 };
+            grp.add(sprite);
         }
 
-        function addLabel(grp, text, pos, offset = new THREE.Vector3(0, 0.4, 0), scale = 0.9) {
-            let sp = makeTextSprite(text, scale);
-            sp.position.copy(pos).add(offset);
-            grp.add(sp);
-        }
-
-        // Функция за създаване на маркер за ъгъл (секторче + дъга)
-        function createSector(center, p1, p2, radius, colorHex = 0xeab308) {
+        function createSector(center, p1, p2, radius, colorHex = 0xeab308, delay = 0) {
             let v1 = p1.clone().sub(center).normalize();
             let v2 = p2.clone().sub(center).normalize();
-            
-            // Гарантираме, че ъгълът е остър (определение за ъгъл между прави)
-            if (v1.dot(v2) < 0) {
-                v2.negate();
-            }
+            if (v1.dot(v2) < 0) v2.negate();
             
             let normal = new THREE.Vector3().crossVectors(v1, v2).normalize();
-            if (normal.lengthSq() < 0.001) normal.set(0, 1, 0); // fallback ако са колинеарни
-            
+            if (normal.lengthSq() < 0.001) normal.set(0, 1, 0); 
             const angle = v1.angleTo(v2);
             
-            // Полупрозрачен сектор
             const geo = new THREE.CircleGeometry(radius, 32, 0, angle);
-            const mat = new THREE.MeshBasicMaterial({ color: colorHex, side: THREE.DoubleSide, transparent: true, opacity: 0.5 });
+            const mat = new THREE.MeshBasicMaterial({ color: colorHex, side: THREE.DoubleSide, transparent: true, opacity: 0 });
             const mesh = new THREE.Mesh(geo, mat);
+            mesh.userData.anim = { type: 'fade', val: 0, target: 0.5, delay: delay, speed: 2 };
             
-            // Завъртане на сектора спрямо векторите
             const matrix = new THREE.Matrix4();
             const yAxis = new THREE.Vector3().crossVectors(normal, v1).normalize();
             matrix.makeBasis(v1, yAxis, normal);
@@ -973,57 +939,99 @@
             const group = new THREE.Group();
             group.add(mesh);
             
-            // Плътна външна дъга за по-добра видимост
             const curve = new THREE.EllipseCurve(0, 0, radius, radius, 0, angle, false, 0);
             const points = curve.getPoints(32);
             const lineGeo = new THREE.BufferGeometry().setFromPoints(points);
+            lineGeo.setDrawRange(0, 0); // Старт на чертането: 0 точки
             const lineMat = new THREE.LineBasicMaterial({ color: colorHex, linewidth: 3 });
             const arc = new THREE.Line(lineGeo, lineMat);
             arc.applyMatrix4(matrix);
             arc.position.copy(center);
+            arc.userData.anim = { type: 'drawArc', val: 0, target: points.length, delay: delay, speed: points.length * 2 };
             group.add(arc);
             
             return group;
         }
 
-        // --- Scene 1: Basic Objects ---
+        // Основният енджин за анимация на чертането
+        function updateAnimations(sceneData, delta) {
+            if (!sceneData || !sceneData.mainGroup) return;
+            sceneData.time += delta;
+            
+            sceneData.mainGroup.traverse((child) => {
+                if (child.userData.anim) {
+                    const anim = child.userData.anim;
+                    if (sceneData.time >= anim.delay) {
+                        if (anim.val < anim.target) {
+                            anim.val += anim.speed * delta;
+                            if (anim.val > anim.target) anim.val = anim.target;
+                            
+                            if (anim.type === 'pop') {
+                                // Пружиниращ ефект за точките
+                                const bounce = Math.sin(anim.val * Math.PI) * 0.3;
+                                child.scale.setScalar(Math.max(0.001, anim.val + bounce));
+                            } else if (anim.type === 'grow') {
+                                child.scale.y = Math.max(0.001, anim.val);
+                            } else if (anim.type === 'fade') {
+                                if (child.material) child.material.opacity = anim.val;
+                            } else if (anim.type === 'drawArc') {
+                                if (child.geometry) child.geometry.setDrawRange(0, Math.floor(anim.val));
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createFloor(yOffset = -1, delay = 0) {
+            const grid = new THREE.GridHelper(10, 10, 0x94a3b8, 0xcbd5e1);
+            grid.position.y = yOffset;
+            grid.material.transparent = true;
+            grid.material.opacity = 0;
+            grid.userData.anim = { type: 'fade', val: 0, target: 0.2, delay: delay, speed: 2 };
+            
+            const plane = createPlane(10, 10);
+            plane.position.y = yOffset - 0.01;
+            plane.material = new THREE.MeshBasicMaterial({color: 0xf1f5f9, transparent: true, opacity: 0});
+            plane.userData.anim = { type: 'fade', val: 0, target: 0.15, delay: delay, speed: 2 };
+            
+            const grp = new THREE.Group();
+            grp.add(grid);
+            grp.add(plane);
+            return grp;
+        }
+
+        // --- Всички сцени с приложени времеви закъснения ---
+
         function initBasicObjects() {
             const ctx = createBaseScene('basic-objects-canvas');
             if (!ctx) return;
+            ctx.time = 0; // Reset time
             const { mainGroup } = ctx;
             
-            // Plane
-            const plane = createPlane(5, 5);
-            plane.position.y = -1;
-            mainGroup.add(plane);
-            addLabel(mainGroup, 'α', new THREE.Vector3(-2, -1, -2), new THREE.Vector3(0, 0.2, 0), 1.2);
-            
-            // Line
-            const p1 = new THREE.Vector3(-2, 0, 0), p2 = new THREE.Vector3(2, 2, 0);
-            mainGroup.add(createLine(p1, p2));
-            addLabel(mainGroup, 'a', p2, new THREE.Vector3(0.2, 0.2, 0));
-
-            // Points
             const ptA = new THREE.Vector3(1, -1, 1);
-            mainGroup.add(createPoint(ptA.x, ptA.y, ptA.z));
-            addLabel(mainGroup, 'A', ptA);
+            mainGroup.add(createPoint(ptA.x, ptA.y, ptA.z, 0.5)); addLabel(mainGroup, 'A', ptA, undefined, undefined, 0.6);
 
             const ptB = new THREE.Vector3(0, 1, 0);
-            mainGroup.add(createPoint(ptB.x, ptB.y, ptB.z));
-            addLabel(mainGroup, 'B', ptB);
+            mainGroup.add(createPoint(ptB.x, ptB.y, ptB.z, 1.0)); addLabel(mainGroup, 'B', ptB, undefined, undefined, 1.1);
 
             const ptC = new THREE.Vector3(-1, 2, 1);
-            mainGroup.add(createPoint(ptC.x, ptC.y, ptC.z));
-            addLabel(mainGroup, 'C', ptC);
+            mainGroup.add(createPoint(ptC.x, ptC.y, ptC.z, 1.5)); addLabel(mainGroup, 'C', ptC, undefined, undefined, 1.6);
+
+            const p1 = new THREE.Vector3(-2, 0, 0), p2 = new THREE.Vector3(2, 2, 0);
+            mainGroup.add(createLine(p1, p2, matLine, 0.04, 2.5)); addLabel(mainGroup, 'a', p2, new THREE.Vector3(0.2, 0.2, 0), undefined, 2.8);
+
+            const plane = createPlane(5, 5, null, 3.5);
+            plane.position.y = -1;
+            mainGroup.add(plane);
+            addLabel(mainGroup, 'α', new THREE.Vector3(-2, -1, -2), new THREE.Vector3(0, 0.2, 0), 1.2, 3.8);
         }
 
-        // --- Scene 2: Notations ---
         let notationCtx = null;
         function initNotations() {
             notationCtx = createBaseScene('notation-canvas');
             if (!notationCtx) return;
             updateNotation('pt_in_line');
-            
             document.querySelectorAll('input[name="notType"]').forEach(radio => {
                 radio.addEventListener('change', (e) => updateNotation(e.target.value));
             });
@@ -1031,371 +1039,276 @@
         
         function updateNotation(type) {
             if (!notationCtx) return;
+            notationCtx.time = 0;
             const grp = notationCtx.mainGroup;
             grp.clear();
             
-            const p1 = new THREE.Vector3(-2, 0, 0);
-            const p2 = new THREE.Vector3(2, 0, 0);
+            const p1 = new THREE.Vector3(-2, 0, 0), p2 = new THREE.Vector3(2, 0, 0);
             const planeOrigin = new THREE.Vector3(-1.5, 0, -1.5);
 
-            if (type === 'pt_in_line') {
-                grp.add(createLine(p1, p2));
-                addLabel(grp, 'a', p2, new THREE.Vector3(0.2, 0.2, 0));
-                const pt = new THREE.Vector3(0, 0, 0);
-                grp.add(createPoint(pt.x, pt.y, pt.z));
-                addLabel(grp, 'A', pt);
-            } else if (type === 'pt_notin_line') {
-                grp.add(createLine(p1, p2));
-                addLabel(grp, 'a', p2, new THREE.Vector3(0.2, 0.2, 0));
-                const pt = new THREE.Vector3(0, 1.5, 0);
-                grp.add(createPoint(pt.x, pt.y, pt.z));
-                addLabel(grp, 'A', pt);
-            } else if (type === 'pt_in_plane') {
-                grp.add(createPlane(4, 4));
-                addLabel(grp, 'α', planeOrigin, new THREE.Vector3(0, 0.2, 0), 1.2);
-                const pt = new THREE.Vector3(1, 0, 1);
-                grp.add(createPoint(pt.x, pt.y, pt.z));
-                addLabel(grp, 'A', pt);
-            } else if (type === 'pt_notin_plane') {
-                grp.add(createPlane(4, 4));
-                addLabel(grp, 'α', planeOrigin, new THREE.Vector3(0, 0.2, 0), 1.2);
-                const pt = new THREE.Vector3(0, 2, 0);
-                grp.add(createPoint(pt.x, pt.y, pt.z));
-                addLabel(grp, 'A', pt);
-            } else if (type === 'line_in_plane') {
-                grp.add(createPlane(4, 4));
-                addLabel(grp, 'α', planeOrigin, new THREE.Vector3(0, 0.2, 0), 1.2);
-                const l1 = new THREE.Vector3(-1.5, 0, -1), l2 = new THREE.Vector3(1.5, 0, 1);
-                grp.add(createLine(l1, l2));
-                addLabel(grp, 'a', l2, new THREE.Vector3(0.2, 0.2, 0));
-            } else if (type === 'line_notin_plane') {
-                grp.add(createPlane(4, 4));
-                addLabel(grp, 'α', planeOrigin, new THREE.Vector3(0, 0.2, 0), 1.2);
-                const l1 = new THREE.Vector3(-2, 1.5, 0), l2 = new THREE.Vector3(2, 1.5, 0);
-                grp.add(createLine(l1, l2));
-                addLabel(grp, 'a', l2, new THREE.Vector3(0.2, 0.2, 0));
+            if (type === 'pt_in_line' || type === 'pt_notin_line') {
+                grp.add(createLine(p1, p2, matLine, 0.04, 0)); addLabel(grp, 'a', p2, new THREE.Vector3(0.2, 0.2, 0), 0.9, 0.2);
+                const pt = type === 'pt_in_line' ? new THREE.Vector3(0, 0, 0) : new THREE.Vector3(0, 1.5, 0);
+                grp.add(createPoint(pt.x, pt.y, pt.z, 0.8)); addLabel(grp, 'A', pt, undefined, undefined, 0.9);
+            } else if (type === 'pt_in_plane' || type === 'pt_notin_plane') {
+                grp.add(createPlane(4, 4, null, 0)); addLabel(grp, 'α', planeOrigin, new THREE.Vector3(0, 0.2, 0), 1.2, 0.2);
+                const pt = type === 'pt_in_plane' ? new THREE.Vector3(1, 0, 1) : new THREE.Vector3(0, 2, 0);
+                grp.add(createPoint(pt.x, pt.y, pt.z, 0.8)); addLabel(grp, 'A', pt, undefined, undefined, 0.9);
+            } else if (type === 'line_in_plane' || type === 'line_notin_plane') {
+                grp.add(createPlane(4, 4, null, 0)); addLabel(grp, 'α', planeOrigin, new THREE.Vector3(0, 0.2, 0), 1.2, 0.2);
+                const l1 = type === 'line_in_plane' ? new THREE.Vector3(-1.5, 0, -1) : new THREE.Vector3(-2, 1.5, 0);
+                const l2 = type === 'line_in_plane' ? new THREE.Vector3(1.5, 0, 1) : new THREE.Vector3(2, 1.5, 0);
+                grp.add(createLine(l1, l2, matLine, 0.04, 0.8)); addLabel(grp, 'a', l2, new THREE.Vector3(0.2, 0.2, 0), 0.9, 1.0);
             } else if (type === 'line_intersect_plane') {
-                grp.add(createPlane(4, 4));
-                addLabel(grp, 'α', planeOrigin, new THREE.Vector3(0, 0.2, 0), 1.2);
+                grp.add(createPlane(4, 4, null, 0)); addLabel(grp, 'α', planeOrigin, new THREE.Vector3(0, 0.2, 0), 1.2, 0.2);
                 const l1 = new THREE.Vector3(-1, -2, -1), l2 = new THREE.Vector3(1, 2, 1);
-                grp.add(createLine(l1, l2));
-                addLabel(grp, 'a', l2, new THREE.Vector3(0.2, 0.2, 0));
+                grp.add(createLine(l1, l2, matLine, 0.04, 0.8)); addLabel(grp, 'a', l2, new THREE.Vector3(0.2, 0.2, 0), 0.9, 1.0);
                 const ptM = new THREE.Vector3(0, 0, 0);
-                grp.add(createPoint(ptM.x, ptM.y, ptM.z));
-                addLabel(grp, 'M', ptM);
+                grp.add(createPoint(ptM.x, ptM.y, ptM.z, 1.5)); addLabel(grp, 'M', ptM, undefined, undefined, 1.6);
             }
         }
 
-        // --- Scene 3: Axioms (с поетапна динамика) ---
         let axiomsCtx = null;
         function initAxioms() {
             axiomsCtx = createBaseScene('axioms-canvas');
             if (!axiomsCtx) return;
             updateAxioms('ax1');
-            
-            document.querySelectorAll('input[name="axiomType"]').forEach(radio => {
-                radio.addEventListener('change', (e) => updateAxioms(e.target.value));
-            });
+            document.querySelectorAll('input[name="axiomType"]').forEach(radio => radio.addEventListener('change', (e) => updateAxioms(e.target.value)));
         }
 
         function updateAxioms(type) {
             if (!axiomsCtx) return;
+            axiomsCtx.time = 0;
             const grp = axiomsCtx.mainGroup;
             grp.clear();
-            if (axiomsCtx.timeoutId) clearTimeout(axiomsCtx.timeoutId);
 
             if (type === 'ax1') {
-                // Поетапно: първо се появяват точките
                 const ptA = new THREE.Vector3(-1, 0, 1), ptB = new THREE.Vector3(1, 0, 1), ptC = new THREE.Vector3(0, 0, -1);
-                grp.add(createPoint(ptA.x, ptA.y, ptA.z)); addLabel(grp, 'A', ptA);
-                grp.add(createPoint(ptB.x, ptB.y, ptB.z)); addLabel(grp, 'B', ptB);
-                grp.add(createPoint(ptC.x, ptC.y, ptC.z)); addLabel(grp, 'C', ptC);
+                grp.add(createPoint(ptA.x, ptA.y, ptA.z, 0)); addLabel(grp, 'A', ptA, undefined, undefined, 0.1);
+                grp.add(createPoint(ptB.x, ptB.y, ptB.z, 0.3)); addLabel(grp, 'B', ptB, undefined, undefined, 0.4);
+                grp.add(createPoint(ptC.x, ptC.y, ptC.z, 0.6)); addLabel(grp, 'C', ptC, undefined, undefined, 0.7);
                 
-                // След това (със забавяне) се появява равнината
-                axiomsCtx.timeoutId = setTimeout(() => {
-                    if (document.querySelector('input[name="axiomType"]:checked').value === 'ax1') {
-                        grp.add(createPlane(4, 4));
-                        addLabel(grp, 'α', new THREE.Vector3(-1.5, 0, -1.5), new THREE.Vector3(0, 0.2, 0), 1.2);
-                    }
-                }, 1000);
+                grp.add(createPlane(4, 4, null, 1.5)); addLabel(grp, 'α', new THREE.Vector3(-1.5, 0, -1.5), new THREE.Vector3(0, 0.2, 0), 1.2, 1.6);
             } else if (type === 'ax2') {
-                grp.add(createPlane(4, 4));
-                addLabel(grp, 'α', new THREE.Vector3(-1.5, 0, -1.5), new THREE.Vector3(0, 0.2, 0), 1.2);
+                grp.add(createPlane(4, 4, null, 0)); addLabel(grp, 'α', new THREE.Vector3(-1.5, 0, -1.5), new THREE.Vector3(0, 0.2, 0), 1.2, 0.1);
                 const ptA = new THREE.Vector3(-1.5, 0, -1), ptB = new THREE.Vector3(1.5, 0, 1);
-                grp.add(createPoint(ptA.x, ptA.y, ptA.z)); addLabel(grp, 'A', ptA);
-                grp.add(createPoint(ptB.x, ptB.y, ptB.z)); addLabel(grp, 'B', ptB);
+                grp.add(createPoint(ptA.x, ptA.y, ptA.z, 0.8)); addLabel(grp, 'A', ptA, undefined, undefined, 0.9);
+                grp.add(createPoint(ptB.x, ptB.y, ptB.z, 1.2)); addLabel(grp, 'B', ptB, undefined, undefined, 1.3);
                 const l1 = new THREE.Vector3(-2.25, 0, -1.5), l2 = new THREE.Vector3(2.25, 0, 1.5);
-                grp.add(createLine(l1, l2));
-                addLabel(grp, 'a', l2, new THREE.Vector3(0.2, 0.2, 0));
+                grp.add(createLine(l1, l2, matLine, 0.04, 2.0)); addLabel(grp, 'a', l2, new THREE.Vector3(0.2, 0.2, 0), 0.9, 2.2);
             } else if (type === 'ax3') {
-                const p1 = createPlane(4, 4);
-                const p2 = createPlane(4, 4, 0x3b82f6); 
-                p2.rotation.x = 0; 
-                grp.add(p1); addLabel(grp, 'α', new THREE.Vector3(-1.5, 0, -1.5), new THREE.Vector3(0, 0.2, 0), 1.2);
-                grp.add(p2); addLabel(grp, 'β', new THREE.Vector3(-1.5, 1.5, 0), new THREE.Vector3(0, 0, 0.2), 1.2);
+                grp.add(createPlane(4, 4, null, 0)); addLabel(grp, 'α', new THREE.Vector3(-1.5, 0, -1.5), new THREE.Vector3(0, 0.2, 0), 1.2, 0.2);
+                const p2 = createPlane(4, 4, 0x3b82f6, 0.8); p2.rotation.x = 0; 
+                grp.add(p2); addLabel(grp, 'β', new THREE.Vector3(-1.5, 1.5, 0), new THREE.Vector3(0, 0, 0.2), 1.2, 1.0);
                 const l1 = new THREE.Vector3(-2, 0, 0), l2 = new THREE.Vector3(2, 0, 0);
-                grp.add(createLine(l1, l2, matLineAlt, 0.06));
-                addLabel(grp, 'c', l2, new THREE.Vector3(0.2, 0.2, 0));
+                grp.add(createLine(l1, l2, matLineAlt, 0.06, 1.8)); addLabel(grp, 'c', l2, new THREE.Vector3(0.2, 0.2, 0), 0.9, 2.0);
             } else if (type === 'ax4') {
-                grp.add(createPlane(5, 5));
-                addLabel(grp, 'α', new THREE.Vector3(-2, 0, -2), new THREE.Vector3(0, 0.2, 0), 1.2);
+                grp.add(createPlane(5, 5, null, 0)); addLabel(grp, 'α', new THREE.Vector3(-2, 0, -2), new THREE.Vector3(0, 0.2, 0), 1.2, 0.2);
                 const v1 = new THREE.Vector3(-1, 0.01, 1), v2 = new THREE.Vector3(1, 0.01, 1), v3 = new THREE.Vector3(0, 0.01, -1);
-                grp.add(createLine(v1, v2)); grp.add(createLine(v2, v3)); grp.add(createLine(v3, v1));
-                grp.add(createPoint(v1.x, v1.y, v1.z)); addLabel(grp, 'A', v1);
-                grp.add(createPoint(v2.x, v2.y, v2.z)); addLabel(grp, 'B', v2);
-                grp.add(createPoint(v3.x, v3.y, v3.z)); addLabel(grp, 'C', v3);
+                
+                grp.add(createPoint(v1.x, v1.y, v1.z, 0.8)); addLabel(grp, 'A', v1, undefined, undefined, 0.9);
+                grp.add(createPoint(v2.x, v2.y, v2.z, 1.2)); addLabel(grp, 'B', v2, undefined, undefined, 1.3);
+                grp.add(createPoint(v3.x, v3.y, v3.z, 1.6)); addLabel(grp, 'C', v3, undefined, undefined, 1.7);
+                
+                grp.add(createLine(v1, v2, matBaseLine, 0.04, 2.2)); 
+                grp.add(createLine(v2, v3, matBaseLine, 0.04, 2.5)); 
+                grp.add(createLine(v3, v1, matBaseLine, 0.04, 2.8));
             }
         }
 
-        // --- Scene 4: Plane Definitions (с поетапна динамика) ---
         let planeDefCtx = null;
         function initPlaneDefs() {
             planeDefCtx = createBaseScene('plane-def-canvas');
             if (!planeDefCtx) return;
             updatePlaneDefs('pd1');
-            
-            document.querySelectorAll('input[name="planeDefType"]').forEach(radio => {
-                radio.addEventListener('change', (e) => updatePlaneDefs(e.target.value));
-            });
+            document.querySelectorAll('input[name="planeDefType"]').forEach(radio => radio.addEventListener('change', (e) => updatePlaneDefs(e.target.value)));
         }
 
         function updatePlaneDefs(type) {
             if (!planeDefCtx) return;
+            planeDefCtx.time = 0;
             const grp = planeDefCtx.mainGroup;
             grp.clear();
-            if (planeDefCtx.timeoutId) clearTimeout(planeDefCtx.timeoutId);
 
-            // Първо се рисуват обектите, определящи равнината
             if (type === 'pd1') {
                 const ptA = new THREE.Vector3(-1, 0, 1), ptB = new THREE.Vector3(1, 0, 1), ptC = new THREE.Vector3(0, 0, -1);
-                grp.add(createPoint(ptA.x, ptA.y, ptA.z)); addLabel(grp, 'A', ptA);
-                grp.add(createPoint(ptB.x, ptB.y, ptB.z)); addLabel(grp, 'B', ptB);
-                grp.add(createPoint(ptC.x, ptC.y, ptC.z)); addLabel(grp, 'C', ptC);
+                grp.add(createPoint(ptA.x, ptA.y, ptA.z, 0)); addLabel(grp, 'A', ptA, undefined, undefined, 0.1);
+                grp.add(createPoint(ptB.x, ptB.y, ptB.z, 0.4)); addLabel(grp, 'B', ptB, undefined, undefined, 0.5);
+                grp.add(createPoint(ptC.x, ptC.y, ptC.z, 0.8)); addLabel(grp, 'C', ptC, undefined, undefined, 0.9);
             } else if (type === 'pd2') {
                 const l1 = new THREE.Vector3(-1.5, 0, 1), l2 = new THREE.Vector3(1.5, 0, 1);
-                grp.add(createLine(l1, l2)); addLabel(grp, 'a', l2, new THREE.Vector3(0.2, 0.2, 0));
+                grp.add(createLine(l1, l2, matLine, 0.04, 0)); addLabel(grp, 'a', l2, new THREE.Vector3(0.2, 0.2, 0), 0.9, 0.2);
                 const pt = new THREE.Vector3(0, 0, -1);
-                grp.add(createPoint(pt.x, pt.y, pt.z)); addLabel(grp, 'A', pt);
+                grp.add(createPoint(pt.x, pt.y, pt.z, 0.8)); addLabel(grp, 'A', pt, undefined, undefined, 0.9);
             } else if (type === 'pd3') {
                 const a1 = new THREE.Vector3(-1.5, 0, -1.5), a2 = new THREE.Vector3(1.5, 0, 1.5);
                 const b1 = new THREE.Vector3(-1.5, 0, 1.5), b2 = new THREE.Vector3(1.5, 0, -1.5);
-                grp.add(createLine(a1, a2)); addLabel(grp, 'a', a2, new THREE.Vector3(0.2, 0.2, 0));
-                grp.add(createLine(b1, b2)); addLabel(grp, 'b', b2, new THREE.Vector3(0.2, 0.2, 0));
+                grp.add(createLine(a1, a2, matLine, 0.04, 0)); addLabel(grp, 'a', a2, new THREE.Vector3(0.2, 0.2, 0), 0.9, 0.2);
+                grp.add(createLine(b1, b2, matLineAlt, 0.04, 0.6)); addLabel(grp, 'b', b2, new THREE.Vector3(0.2, 0.2, 0), 0.9, 0.8);
                 const ptM = new THREE.Vector3(0, 0, 0);
-                grp.add(createPoint(ptM.x, ptM.y, ptM.z)); addLabel(grp, 'M', ptM);
+                grp.add(createPoint(ptM.x, ptM.y, ptM.z, 1.2)); addLabel(grp, 'M', ptM, undefined, undefined, 1.3);
             } else if (type === 'pd4') {
                 const a1 = new THREE.Vector3(-1.5, 0, 1), a2 = new THREE.Vector3(1.5, 0, 1);
                 const b1 = new THREE.Vector3(-1.5, 0, -1), b2 = new THREE.Vector3(1.5, 0, -1);
-                grp.add(createLine(a1, a2)); addLabel(grp, 'a', a2, new THREE.Vector3(0.2, 0.2, 0));
-                grp.add(createLine(b1, b2)); addLabel(grp, 'b', b2, new THREE.Vector3(0.2, 0.2, 0));
+                grp.add(createLine(a1, a2, matLine, 0.04, 0)); addLabel(grp, 'a', a2, new THREE.Vector3(0.2, 0.2, 0), 0.9, 0.2);
+                grp.add(createLine(b1, b2, matLineAlt, 0.04, 0.6)); addLabel(grp, 'b', b2, new THREE.Vector3(0.2, 0.2, 0), 0.9, 0.8);
             }
 
-            // След това (със забавяне) се появява самата равнина
-            planeDefCtx.timeoutId = setTimeout(() => {
-                if (document.querySelector('input[name="planeDefType"]:checked').value === type) {
-                    grp.add(createPlane(4, 4)); 
-                    addLabel(grp, 'α', new THREE.Vector3(-1.5, 0, -1.5), new THREE.Vector3(0, 0.2, 0), 1.2);
-                }
-            }, 1000);
+            grp.add(createPlane(4, 4, null, 1.8)); 
+            addLabel(grp, 'α', new THREE.Vector3(-1.5, 0, -1.5), new THREE.Vector3(0, 0.2, 0), 1.2, 2.0);
         }
 
-        // --- Scene 5: Mutual Positions ---
         let posCtx = null;
         function initPositions() {
             posCtx = createBaseScene('position-canvas');
             if (!posCtx) return;
             updatePositions('intersecting');
-            
-            document.querySelectorAll('input[name="linePosition"]').forEach(radio => {
-                radio.addEventListener('change', (e) => updatePositions(e.target.value));
-            });
+            document.querySelectorAll('input[name="linePosition"]').forEach(radio => radio.addEventListener('change', (e) => updatePositions(e.target.value)));
         }
 
         function updatePositions(type) {
             if (!posCtx) return;
+            posCtx.time = 0;
             const grp = posCtx.mainGroup;
             grp.clear();
 
-            if (type === 'intersecting') {
-                grp.add(createPlane(4, 4)); addLabel(grp, 'α', new THREE.Vector3(-1.5, 0, -1.5), new THREE.Vector3(0, 0.2, 0), 1.2);
-                const a1 = new THREE.Vector3(-1.5, 0, -1.5), a2 = new THREE.Vector3(1.5, 0, 1.5);
-                const b1 = new THREE.Vector3(-1.5, 0, 1.5), b2 = new THREE.Vector3(1.5, 0, -1.5);
-                grp.add(createLine(a1, a2)); addLabel(grp, 'a', a2, new THREE.Vector3(0.2, 0.2, 0));
-                grp.add(createLine(b1, b2, matLineAlt)); addLabel(grp, 'b', b2, new THREE.Vector3(0.2, 0.2, 0));
-                const ptM = new THREE.Vector3(0, 0, 0);
-                grp.add(createPoint(ptM.x, ptM.y, ptM.z)); addLabel(grp, 'M', ptM);
-            } else if (type === 'parallel') {
-                grp.add(createPlane(4, 4)); addLabel(grp, 'α', new THREE.Vector3(-1.5, 0, -1.5), new THREE.Vector3(0, 0.2, 0), 1.2);
-                const a1 = new THREE.Vector3(-1.5, 0, 1), a2 = new THREE.Vector3(1.5, 0, 1);
-                const b1 = new THREE.Vector3(-1.5, 0, -1), b2 = new THREE.Vector3(1.5, 0, -1);
-                grp.add(createLine(a1, a2)); addLabel(grp, 'a', a2, new THREE.Vector3(0.2, 0.2, 0));
-                grp.add(createLine(b1, b2, matLineAlt)); addLabel(grp, 'b', b2, new THREE.Vector3(0.2, 0.2, 0));
+            if (type === 'intersecting' || type === 'parallel') {
+                grp.add(createPlane(4, 4, null, 0)); addLabel(grp, 'α', new THREE.Vector3(-1.5, 0, -1.5), new THREE.Vector3(0, 0.2, 0), 1.2, 0.2);
+                
+                const a1 = type === 'intersecting' ? new THREE.Vector3(-1.5, 0, -1.5) : new THREE.Vector3(-1.5, 0, 1);
+                const a2 = type === 'intersecting' ? new THREE.Vector3(1.5, 0, 1.5) : new THREE.Vector3(1.5, 0, 1);
+                const b1 = type === 'intersecting' ? new THREE.Vector3(-1.5, 0, 1.5) : new THREE.Vector3(-1.5, 0, -1);
+                const b2 = type === 'intersecting' ? new THREE.Vector3(1.5, 0, -1.5) : new THREE.Vector3(1.5, 0, -1);
+                
+                grp.add(createLine(a1, a2, matLine, 0.04, 0.8)); addLabel(grp, 'a', a2, new THREE.Vector3(0.2, 0.2, 0), 0.9, 1.0);
+                grp.add(createLine(b1, b2, matLineAlt, 0.04, 1.4)); addLabel(grp, 'b', b2, new THREE.Vector3(0.2, 0.2, 0), 0.9, 1.6);
+                
+                if (type === 'intersecting') {
+                    const ptM = new THREE.Vector3(0, 0, 0);
+                    grp.add(createPoint(ptM.x, ptM.y, ptM.z, 2.2)); addLabel(grp, 'M', ptM, undefined, undefined, 2.3);
+                }
             } else if (type === 'skew') {
                 const a1 = new THREE.Vector3(-2, 1, 0), a2 = new THREE.Vector3(2, 1, 0);
-                grp.add(createLine(a1, a2)); addLabel(grp, 'a', a2, new THREE.Vector3(0.2, 0.2, 0));
+                grp.add(createLine(a1, a2, matLine, 0.04, 0)); addLabel(grp, 'a', a2, new THREE.Vector3(0.2, 0.2, 0), 0.9, 0.2);
                 
                 const b1 = new THREE.Vector3(0, -1, -2), b2 = new THREE.Vector3(0, -1, 2);
-                grp.add(createLine(b1, b2, matLineAlt)); addLabel(grp, 'b', b2, new THREE.Vector3(0.2, 0.2, 0));
+                grp.add(createLine(b1, b2, matLineAlt, 0.04, 0.8)); addLabel(grp, 'b', b2, new THREE.Vector3(0.2, 0.2, 0), 0.9, 1.0);
             } else if (type === 'skew_criterion') {
-                grp.add(createPlane(4, 4)); addLabel(grp, 'α', new THREE.Vector3(-1.5, 0, -1.5), new THREE.Vector3(0, 0.2, 0), 1.2);
+                grp.add(createPlane(4, 4, null, 0)); addLabel(grp, 'α', new THREE.Vector3(-1.5, 0, -1.5), new THREE.Vector3(0, 0.2, 0), 1.2, 0.2);
                 
                 const a1 = new THREE.Vector3(-1.5, 0, 1), a2 = new THREE.Vector3(1.5, 0, 1);
-                grp.add(createLine(a1, a2)); addLabel(grp, 'a', a2, new THREE.Vector3(0.2, 0.2, 0));
+                grp.add(createLine(a1, a2, matLine, 0.04, 0.8)); addLabel(grp, 'a', a2, new THREE.Vector3(0.2, 0.2, 0), 0.9, 1.0);
                 
                 const b1 = new THREE.Vector3(0, -2, -1), b2 = new THREE.Vector3(0, 2, -1);
-                grp.add(createLine(b1, b2, matLineAlt)); addLabel(grp, 'b', b2, new THREE.Vector3(0.2, 0.2, 0));
+                grp.add(createLine(b1, b2, matLineAlt, 0.04, 1.6)); addLabel(grp, 'b', b2, new THREE.Vector3(0.2, 0.2, 0), 0.9, 1.8);
                 
                 const ptM = new THREE.Vector3(0, 0, -1);
-                grp.add(createPoint(ptM.x, ptM.y, ptM.z)); addLabel(grp, 'M', ptM);
+                grp.add(createPoint(ptM.x, ptM.y, ptM.z, 2.4)); addLabel(grp, 'M', ptM, undefined, undefined, 2.5);
             }
         }
 
-        // --- Scene: Angle between Skew Lines (с поетапно построяване и сектор) ---
         let angleSkewCtx = null;
         function initAngleSkew() {
             angleSkewCtx = createBaseScene('angle-skew-canvas');
             if (!angleSkewCtx) return;
             updateAngleSkew('step1');
-            
-            document.querySelectorAll('input[name="angleSkewType"]').forEach(radio => {
-                radio.addEventListener('change', (e) => updateAngleSkew(e.target.value));
-            });
+            document.querySelectorAll('input[name="angleSkewType"]').forEach(radio => radio.addEventListener('change', (e) => updateAngleSkew(e.target.value)));
         }
 
         function updateAngleSkew(step) {
             if (!angleSkewCtx) return;
+            angleSkewCtx.time = 0;
             const grp = angleSkewCtx.mainGroup;
             grp.clear();
-            if (angleSkewCtx.timeoutId) clearTimeout(angleSkewCtx.timeoutId);
 
-            // Skew lines
             const a1 = new THREE.Vector3(-2, 1, -1), a2 = new THREE.Vector3(2, 1, 1);
             const b1 = new THREE.Vector3(-2, -1, 1), b2 = new THREE.Vector3(2, -1, -1);
             
-            // Винаги показваме правата a
-            grp.add(createLine(a1, a2, matLine)); addLabel(grp, 'a', a2, new THREE.Vector3(0.2, 0.2, 0));
+            grp.add(createLine(a1, a2, matLine, 0.04, 0)); addLabel(grp, 'a', a2, new THREE.Vector3(0.2, 0.2, 0), 0.9, 0.2);
             
             if (step === 'step1') {
-                // Поетапно добавяне на втората права b за ефект
-                angleSkewCtx.timeoutId = setTimeout(() => {
-                    if (document.querySelector('input[name="angleSkewType"]:checked').value === 'step1') {
-                        grp.add(createLine(b1, b2, matLineAlt)); addLabel(grp, 'b', b2, new THREE.Vector3(0.2, 0.2, 0));
-                    }
-                }, 600);
+                grp.add(createLine(b1, b2, matLineAlt, 0.04, 0.6)); addLabel(grp, 'b', b2, new THREE.Vector3(0.2, 0.2, 0), 0.9, 0.8);
             } else if (step === 'step2') {
-                grp.add(createLine(b1, b2, matLineAlt)); addLabel(grp, 'b', b2, new THREE.Vector3(0.2, 0.2, 0));
-                const ptM = new THREE.Vector3(0, 1, 0); // Midpoint of a
-                // Поетапно добавяне на точката M
-                angleSkewCtx.timeoutId = setTimeout(() => {
-                    if (document.querySelector('input[name="angleSkewType"]:checked').value === 'step2') {
-                        grp.add(createPoint(ptM.x, ptM.y, ptM.z)); addLabel(grp, 'M', ptM);
-                    }
-                }, 800);
+                grp.add(createLine(b1, b2, matLineAlt, 0.04, 0)); addLabel(grp, 'b', b2, new THREE.Vector3(0.2, 0.2, 0), 0.9, 0);
+                const ptM = new THREE.Vector3(0, 1, 0); 
+                grp.add(createPoint(ptM.x, ptM.y, ptM.z, 0.8)); addLabel(grp, 'M', ptM, undefined, undefined, 0.9);
             } else if (step === 'step3') {
-                grp.add(createLine(b1, b2, matLineAlt)); addLabel(grp, 'b', b2, new THREE.Vector3(0.2, 0.2, 0));
+                grp.add(createLine(b1, b2, matLineAlt, 0.04, 0)); addLabel(grp, 'b', b2, new THREE.Vector3(0.2, 0.2, 0), 0.9, 0);
                 const ptM = new THREE.Vector3(0, 1, 0); 
-                grp.add(createPoint(ptM.x, ptM.y, ptM.z)); addLabel(grp, 'M', ptM);
+                grp.add(createPoint(ptM.x, ptM.y, ptM.z, 0)); addLabel(grp, 'M', ptM, undefined, undefined, 0);
                 
-                const b1_trans_1 = new THREE.Vector3(-2, 1, 1);
-                const b1_trans_2 = new THREE.Vector3(2, 1, -1);
-                // Поетапно построяване на успоредната права b1
-                angleSkewCtx.timeoutId = setTimeout(() => {
-                    if (document.querySelector('input[name="angleSkewType"]:checked').value === 'step3') {
-                        grp.add(createLine(b1_trans_1, b1_trans_2, matHigh3)); 
-                        addLabel(grp, 'b₁', b1_trans_2, new THREE.Vector3(0.2, 0.2, 0));
-                    }
-                }, 800);
+                const b1_trans_1 = new THREE.Vector3(-2, 1, 1), b1_trans_2 = new THREE.Vector3(2, 1, -1);
+                grp.add(createLine(b1_trans_1, b1_trans_2, matHigh3, 0.04, 0.8)); 
+                addLabel(grp, 'b₁', b1_trans_2, new THREE.Vector3(0.2, 0.2, 0), 0.9, 1.0);
             } else if (step === 'step4') {
-                grp.add(createLine(b1, b2, new THREE.MeshPhongMaterial({ color: 0x10b981, transparent: true, opacity: 0.2 }))); 
-                addLabel(grp, 'b', b2, new THREE.Vector3(0.2, 0.2, 0));
+                const dimMat = new THREE.MeshPhongMaterial({ color: 0x10b981, transparent: true, opacity: 0.2 });
+                grp.add(createLine(b1, b2, dimMat, 0.04, 0)); addLabel(grp, 'b', b2, new THREE.Vector3(0.2, 0.2, 0), 0.9, 0);
                 const ptM = new THREE.Vector3(0, 1, 0); 
-                grp.add(createPoint(ptM.x, ptM.y, ptM.z)); addLabel(grp, 'M', ptM);
+                grp.add(createPoint(ptM.x, ptM.y, ptM.z, 0)); addLabel(grp, 'M', ptM, undefined, undefined, 0);
                 
-                const b1_trans_1 = new THREE.Vector3(-2, 1, 1);
-                const b1_trans_2 = new THREE.Vector3(2, 1, -1);
-                grp.add(createLine(b1_trans_1, b1_trans_2, matHigh3)); 
-                addLabel(grp, 'b₁', b1_trans_2, new THREE.Vector3(0.2, 0.2, 0));
+                const b1_trans_1 = new THREE.Vector3(-2, 1, 1), b1_trans_2 = new THREE.Vector3(2, 1, -1);
+                grp.add(createLine(b1_trans_1, b1_trans_2, matHigh3, 0.04, 0)); 
+                addLabel(grp, 'b₁', b1_trans_2, new THREE.Vector3(0.2, 0.2, 0), 0.9, 0);
                 
-                // Поетапно маркиране на ъгъла и добавяне на сектор
-                angleSkewCtx.timeoutId = setTimeout(() => {
-                    if (document.querySelector('input[name="angleSkewType"]:checked').value === 'step4') {
-                        // Изчертаваме маркировката за ъгъл φ между права 'a' и 'b1'
-                        grp.add(createSector(ptM, a2, b1_trans_1, 0.7, 0xeab308));
-                        
-                        // Изчисляване на ъглополовящата за перфектно позициониране на надписа
-                        let vA = a2.clone().sub(ptM).normalize();
-                        let vB = b1_trans_1.clone().sub(ptM).normalize();
-                        if (vA.dot(vB) < 0) vB.negate(); // Гарантираме остър ъгъл
-                        let bisector = vA.add(vB).normalize();
-                        let labelPos = ptM.clone().add(bisector.multiplyScalar(0.95)); // 0.7 е радиусът, 0.95 е точно извън него
-                        
-                        addLabel(grp, 'φ', labelPos, new THREE.Vector3(0,0,0), 0.9);
-                    }
-                }, 800);
+                grp.add(createSector(ptM, a2, b1_trans_1, 0.7, 0xeab308, 0.8));
+                
+                let vA = a2.clone().sub(ptM).normalize();
+                let vB = b1_trans_1.clone().sub(ptM).normalize();
+                if (vA.dot(vB) < 0) vB.negate(); 
+                let bisector = vA.add(vB).normalize();
+                let labelPos = ptM.clone().add(bisector.multiplyScalar(0.95)); 
+                
+                addLabel(grp, 'φ', labelPos, new THREE.Vector3(0,0,0), 0.9, 1.4);
             }
         }
 
-        // --- Scene 6: Theorems ---
         let thmCtx = null;
         function initTheorems() {
             thmCtx = createBaseScene('theorems-canvas');
             if (!thmCtx) return;
             updateTheorems('th1');
-            
-            document.querySelectorAll('input[name="theoremType"]').forEach(radio => {
-                radio.addEventListener('change', (e) => updateTheorems(e.target.value));
-            });
+            document.querySelectorAll('input[name="theoremType"]').forEach(radio => radio.addEventListener('change', (e) => updateTheorems(e.target.value)));
         }
 
         function updateTheorems(type) {
             if (!thmCtx) return;
+            thmCtx.time = 0;
             const grp = thmCtx.mainGroup;
             grp.clear();
 
             if (type === 'th1') {
                 const a1 = new THREE.Vector3(-2, -1, 0), a2 = new THREE.Vector3(2, -1, 0);
-                grp.add(createLine(a1, a2)); addLabel(grp, 'a', a2, new THREE.Vector3(0.2, 0.2, 0));
+                grp.add(createLine(a1, a2, matLine, 0.04, 0)); addLabel(grp, 'a', a2, new THREE.Vector3(0.2, 0.2, 0), 0.9, 0.2);
                 const ptA = new THREE.Vector3(0, 1, 0);
-                grp.add(createPoint(ptA.x, ptA.y, ptA.z)); addLabel(grp, 'A', ptA);
+                grp.add(createPoint(ptA.x, ptA.y, ptA.z, 0.8)); addLabel(grp, 'A', ptA, undefined, undefined, 0.9);
                 const b1 = new THREE.Vector3(-2, 1, 0), b2 = new THREE.Vector3(2, 1, 0);
-                grp.add(createLine(b1, b2, matLineAlt)); addLabel(grp, 'b', b2, new THREE.Vector3(0.2, 0.2, 0));
+                grp.add(createLine(b1, b2, matLineAlt, 0.04, 1.6)); addLabel(grp, 'b', b2, new THREE.Vector3(0.2, 0.2, 0), 0.9, 1.8);
             } else if (type === 'th2') {
-                const a1 = new THREE.Vector3(-2, 1, 1), a2 = new THREE.Vector3(2, 1, 1);
-                const b1 = new THREE.Vector3(-2, 1, -1), b2 = new THREE.Vector3(2, 1, -1);
                 const c1 = new THREE.Vector3(-2, -1, 0), c2 = new THREE.Vector3(2, -1, 0);
-                grp.add(createLine(a1, a2, matLine)); addLabel(grp, 'a', a2, new THREE.Vector3(0.2, 0.2, 0));
-                grp.add(createLine(c1, c2, matLineAlt)); addLabel(grp, 'c', c2, new THREE.Vector3(0.2, 0.2, 0));
-                grp.add(createLine(b1, b2, matLine)); addLabel(grp, 'b', b2, new THREE.Vector3(0.2, 0.2, 0));
+                grp.add(createLine(c1, c2, matLineAlt, 0.04, 0)); addLabel(grp, 'c', c2, new THREE.Vector3(0.2, 0.2, 0), 0.9, 0.2);
+                
+                const a1 = new THREE.Vector3(-2, 1, 1), a2 = new THREE.Vector3(2, 1, 1);
+                grp.add(createLine(a1, a2, matLine, 0.04, 0.8)); addLabel(grp, 'a', a2, new THREE.Vector3(0.2, 0.2, 0), 0.9, 1.0);
+                
+                const b1 = new THREE.Vector3(-2, 1, -1), b2 = new THREE.Vector3(2, 1, -1);
+                grp.add(createLine(b1, b2, matLine, 0.04, 1.6)); addLabel(grp, 'b', b2, new THREE.Vector3(0.2, 0.2, 0), 0.9, 1.8);
             } else if (type === 'th3') {
-                const p = createPlane(4, 4);
-                p.rotation.x = -Math.PI / 4;
-                grp.add(p); addLabel(grp, 'α', new THREE.Vector3(-1.5, 1, -1.5), new THREE.Vector3(0, 0.2, 0), 1.2);
+                const p = createPlane(4, 4, null, 0); p.rotation.x = -Math.PI / 4;
+                grp.add(p); addLabel(grp, 'α', new THREE.Vector3(-1.5, 1, -1.5), new THREE.Vector3(0, 0.2, 0), 1.2, 0.2);
                 
                 const a1 = new THREE.Vector3(-1, -2, 0), a2 = new THREE.Vector3(-1, 2, 0);
-                const b1 = new THREE.Vector3(1, -2, 0), b2 = new THREE.Vector3(1, 2, 0);
-                grp.add(createLine(a1, a2)); addLabel(grp, 'a', a2, new THREE.Vector3(0.2, 0.2, 0));
-                grp.add(createLine(b1, b2, matLineAlt)); addLabel(grp, 'b', b2, new THREE.Vector3(0.2, 0.2, 0));
+                grp.add(createLine(a1, a2, matLine, 0.04, 0.8)); addLabel(grp, 'a', a2, new THREE.Vector3(0.2, 0.2, 0), 0.9, 1.0);
+                const ptM1 = new THREE.Vector3(-1, 0, 0);
+                grp.add(createPoint(ptM1.x, ptM1.y, ptM1.z, 1.6)); addLabel(grp, 'M₁', ptM1, new THREE.Vector3(-0.4, 0.2, 0), 0.9, 1.7);
                 
-                const ptM1 = new THREE.Vector3(-1, 0, 0), ptM2 = new THREE.Vector3(1, 0, 0);
-                grp.add(createPoint(ptM1.x, ptM1.y, ptM1.z)); addLabel(grp, 'M₁', ptM1, new THREE.Vector3(-0.4, 0.2, 0));
-                grp.add(createPoint(ptM2.x, ptM2.y, ptM2.z)); addLabel(grp, 'M₂', ptM2, new THREE.Vector3(0.4, 0.2, 0));
+                const b1 = new THREE.Vector3(1, -2, 0), b2 = new THREE.Vector3(1, 2, 0);
+                grp.add(createLine(b1, b2, matLineAlt, 0.04, 2.4)); addLabel(grp, 'b', b2, new THREE.Vector3(0.2, 0.2, 0), 0.9, 2.6);
+                const ptM2 = new THREE.Vector3(1, 0, 0);
+                grp.add(createPoint(ptM2.x, ptM2.y, ptM2.z, 3.2)); addLabel(grp, 'M₂', ptM2, new THREE.Vector3(0.4, 0.2, 0), 0.9, 3.3);
             }
         }
 
-        // Помощна функция за генериране на под (задачите)
-        function createFloor(yOffset = -1) {
-            const grid = new THREE.GridHelper(10, 10, 0x94a3b8, 0xcbd5e1);
-            grid.position.y = yOffset;
-            const plane = createPlane(10, 10);
-            plane.position.y = yOffset - 0.01;
-            plane.material = new THREE.MeshBasicMaterial({color: 0xf1f5f9, transparent: true, opacity: 0.15});
-            const grp = new THREE.Group();
-            grp.add(grid);
-            grp.add(plane);
-            return grp;
-        }
-
-        // --- 7. Practical Tasks Logic ---
+        // --- Практически задачи ---
         function initTasks() {
             const ctx1 = createBaseScene('task1-canvas');
             const ctx2 = createBaseScene('task2-canvas');
@@ -1414,31 +1327,32 @@
                 };
             }
             
-            function drawCubeBase(grp, v, excludeFront=false) {
+            function drawCubeBase(grp, v, excludeFront=false, delayStart = 0) {
                 const edges = [
                     ['A','B'],['B','C'],['C','D'],['D','A'],
                     ['A1','B1'],['B1','C1'],['C1','D1'],['D1','A1'],
                     ['A','A1'],['B','B1'],['C','C1'],['D','D1']
                 ];
+                let d = delayStart;
                 edges.forEach(([p1, p2]) => {
                     if(excludeFront && (p1==='A'||p1==='B'||p1==='A1'||p1==='B1') && (p2==='A'||p2==='B'||p2==='A1'||p2==='B1')) {
-                        if (p1==='A' && p2==='A1') {} // keep back/sides
-                        else return; // exclude front for "room" look
+                        if (!(p1==='A' && p2==='A1')) return; 
                     }
-                    grp.add(createLine(v[p1], v[p2], matBaseLine, 0.02));
+                    grp.add(createLine(v[p1], v[p2], matBaseLine, 0.02, d));
+                    d += 0.08; // Рисува ръбовете бързо един след друг
                 });
-                for(let k in v) { grp.add(createPoint(v[k].x, v[k].y, v[k].z)); }
-                for(let k in v) {
-                    addLabel(grp, k, v[k], new THREE.Vector3(0, k.includes('1')?0.3:-0.3, 0), 0.7);
+                for(let k in v) { 
+                    grp.add(createPoint(v[k].x, v[k].y, v[k].z, d)); 
+                    addLabel(grp, k, v[k], new THREE.Vector3(0, k.includes('1')?0.3:-0.3, 0), 0.7, d + 0.1);
                 }
+                return d + 0.2;
             }
 
-            // Task 1 Logic (Table)
             function updateT1(val) {
                 if(!ctx1) return;
+                ctx1.time = 0;
                 ctx1.mainGroup.clear();
-                
-                ctx1.mainGroup.add(createFloor(-1.0));
+                ctx1.mainGroup.add(createFloor(-1.0, 0));
                 
                 const tableGrp = new THREE.Group();
                 ctx1.mainGroup.add(tableGrp);
@@ -1446,46 +1360,41 @@
 
                 if(val === 't1_3') {
                     const p1 = new THREE.Vector3(-1.2, -1, 0.8), p2 = new THREE.Vector3(1.2, -1, 0.8), p3 = new THREE.Vector3(0, -1, -1.2);
-                    tableGrp.add(createPoint(p1.x, p1.y, p1.z)); addLabel(tableGrp, 'A', p1, new THREE.Vector3(0,-0.3,0));
-                    tableGrp.add(createPoint(p2.x, p2.y, p2.z)); addLabel(tableGrp, 'B', p2, new THREE.Vector3(0,-0.3,0));
-                    tableGrp.add(createPoint(p3.x, p3.y, p3.z)); addLabel(tableGrp, 'C', p3, new THREE.Vector3(0,-0.3,0));
-                    tableGrp.add(createLine(p1, new THREE.Vector3(p1.x, 0.5, p1.z), matBaseLine));
-                    tableGrp.add(createLine(p2, new THREE.Vector3(p2.x, 0.5, p2.z), matBaseLine));
-                    tableGrp.add(createLine(p3, new THREE.Vector3(p3.x, 0.5, p3.z), matBaseLine));
+                    tableGrp.add(createLine(p1, new THREE.Vector3(p1.x, 0.5, p1.z), matBaseLine, 0.04, 0.5));
+                    tableGrp.add(createLine(p2, new THREE.Vector3(p2.x, 0.5, p2.z), matBaseLine, 0.04, 0.7));
+                    tableGrp.add(createLine(p3, new THREE.Vector3(p3.x, 0.5, p3.z), matBaseLine, 0.04, 0.9));
+                    tableGrp.add(createPoint(p1.x, p1.y, p1.z, 1.2)); addLabel(tableGrp, 'A', p1, new THREE.Vector3(0,-0.3,0), 0.9, 1.3);
+                    tableGrp.add(createPoint(p2.x, p2.y, p2.z, 1.2)); addLabel(tableGrp, 'B', p2, new THREE.Vector3(0,-0.3,0), 0.9, 1.3);
+                    tableGrp.add(createPoint(p3.x, p3.y, p3.z, 1.2)); addLabel(tableGrp, 'C', p3, new THREE.Vector3(0,-0.3,0), 0.9, 1.3);
                     
                     const topShape = new THREE.Shape();
-                    // Координатите са коригирани, за да покриват точно краката на масата
-                    topShape.moveTo(-1.6, -1.1); 
-                    topShape.lineTo(1.6, -1.1); 
-                    topShape.lineTo(0, 1.6);
-                    
-                    // Добавена е дебелина (depth) на плота, за да изглежда реалистично и да не се "пробива"
-                    const extrudeSettings = { depth: 0.1, bevelEnabled: true, bevelThickness: 0.02, bevelSize: 0.02, bevelSegments: 2 };
-                    const topGeo = new THREE.ExtrudeGeometry(topShape, extrudeSettings);
+                    topShape.moveTo(-1.6, -1.1); topShape.lineTo(1.6, -1.1); topShape.lineTo(0, 1.6);
+                    const topGeo = new THREE.ExtrudeGeometry(topShape, { depth: 0.1, bevelEnabled: true, bevelThickness: 0.02, bevelSize: 0.02, bevelSegments: 2 });
                     const topMesh = new THREE.Mesh(topGeo, new THREE.MeshPhongMaterial({color: 0x8b5cf6}));
                     topMesh.rotation.x = -Math.PI/2;
-                    topMesh.position.y = 0.5; // Сяда точно върху краката
+                    topMesh.position.y = 0.5; 
+                    topMesh.scale.setScalar(0.001);
+                    topMesh.userData.anim = { type: 'pop', val: 0, target: 1, delay: 1.8, speed: 3 };
                     tableGrp.add(topMesh);
                     
                     ctx1.isWobbling = false;
                 } else {
-                    const p1 = new THREE.Vector3(-1, -1, 1), p2 = new THREE.Vector3(1, -1, 1);
-                    const p3 = new THREE.Vector3(1, -1, -1), p4 = new THREE.Vector3(-1, -0.6, -1); // Къс крак
+                    const p1 = new THREE.Vector3(-1, -1, 1), p2 = new THREE.Vector3(1, -1, 1), p3 = new THREE.Vector3(1, -1, -1), p4 = new THREE.Vector3(-1, -0.6, -1); 
+                    tableGrp.add(createLine(p1, new THREE.Vector3(p1.x, 0.5, p1.z), matBaseLine, 0.04, 0.5));
+                    tableGrp.add(createLine(p2, new THREE.Vector3(p2.x, 0.5, p2.z), matBaseLine, 0.04, 0.7));
+                    tableGrp.add(createLine(p3, new THREE.Vector3(p3.x, 0.5, p3.z), matBaseLine, 0.04, 0.9));
+                    tableGrp.add(createLine(p4, new THREE.Vector3(p4.x, 0.5, p4.z), matHigh1, 0.04, 1.1)); // Short leg in red
                     
-                    tableGrp.add(createPoint(p1.x, p1.y, p1.z)); addLabel(tableGrp, 'A', p1, new THREE.Vector3(0,-0.3,0));
-                    tableGrp.add(createPoint(p2.x, p2.y, p2.z)); addLabel(tableGrp, 'B', p2, new THREE.Vector3(0,-0.3,0));
-                    tableGrp.add(createPoint(p3.x, p3.y, p3.z)); addLabel(tableGrp, 'C', p3, new THREE.Vector3(0,-0.3,0));
-                    tableGrp.add(createPoint(p4.x, p4.y, p4.z)); addLabel(tableGrp, 'D', p4, new THREE.Vector3(0,-0.3,0));
+                    tableGrp.add(createPoint(p1.x, p1.y, p1.z, 1.5)); addLabel(tableGrp, 'A', p1, new THREE.Vector3(0,-0.3,0), 0.9, 1.6);
+                    tableGrp.add(createPoint(p2.x, p2.y, p2.z, 1.5)); addLabel(tableGrp, 'B', p2, new THREE.Vector3(0,-0.3,0), 0.9, 1.6);
+                    tableGrp.add(createPoint(p3.x, p3.y, p3.z, 1.5)); addLabel(tableGrp, 'C', p3, new THREE.Vector3(0,-0.3,0), 0.9, 1.6);
+                    tableGrp.add(createPoint(p4.x, p4.y, p4.z, 1.5)); addLabel(tableGrp, 'D', p4, new THREE.Vector3(0,-0.3,0), 0.9, 1.6);
                     
-                    tableGrp.add(createLine(p1, new THREE.Vector3(p1.x, 0.5, p1.z), matBaseLine));
-                    tableGrp.add(createLine(p2, new THREE.Vector3(p2.x, 0.5, p2.z), matBaseLine));
-                    tableGrp.add(createLine(p3, new THREE.Vector3(p3.x, 0.5, p3.z), matBaseLine));
-                    tableGrp.add(createLine(p4, new THREE.Vector3(p4.x, 0.5, p4.z), matBaseLine));
-                    
-                    // Използваме BoxGeometry вместо PlaneGeometry, за да има дебелина плотът
                     const topGeo = new THREE.BoxGeometry(2.6, 0.1, 2.6);
                     const topMesh = new THREE.Mesh(topGeo, new THREE.MeshPhongMaterial({color: 0x8b5cf6}));
-                    topMesh.position.y = 0.55; // Сяда точно върху краката (0.5 + 0.1/2)
+                    topMesh.position.y = 0.55; 
+                    topMesh.scale.setScalar(0.001);
+                    topMesh.userData.anim = { type: 'pop', val: 0, target: 1, delay: 2.0, speed: 3 };
                     tableGrp.add(topMesh);
                     
                     ctx1.isWobbling = true;
@@ -1495,181 +1404,208 @@
             document.querySelectorAll('input[name="t1"]').forEach(r => r.addEventListener('change', e => updateT1(e.target.value)));
             updateT1('t1_3');
 
-            // Task 2 Logic (3 lines)
             function updateT2(val) {
                 if(!ctx2) return;
+                ctx2.time = 0;
                 ctx2.mainGroup.clear();
-                ctx2.mainGroup.add(createFloor(-2.5));
+                ctx2.mainGroup.add(createFloor(-2.5, 0));
                 const o = new THREE.Vector3(0,0,0);
-                ctx2.mainGroup.add(createPoint(0,0,0)); addLabel(ctx2.mainGroup, 'O', o);
+                ctx2.mainGroup.add(createPoint(0,0,0, 0.5)); addLabel(ctx2.mainGroup, 'O', o, undefined, undefined, 0.6);
+                
                 if(val === 't2_1') {
                     const l1 = new THREE.Vector3(2,0,0), l2 = new THREE.Vector3(1.5,0,1.5), l3 = new THREE.Vector3(1.5,0,-1.5);
-                    ctx2.mainGroup.add(createLine(new THREE.Vector3(-2,0,0), l1)); addLabel(ctx2.mainGroup, 'a', l1, new THREE.Vector3(0.2,0.2,0));
-                    ctx2.mainGroup.add(createLine(new THREE.Vector3(-1.5,0,-1.5), l2)); addLabel(ctx2.mainGroup, 'b', l2, new THREE.Vector3(0.2,0.2,0));
-                    ctx2.mainGroup.add(createLine(new THREE.Vector3(-1.5,0,1.5), l3)); addLabel(ctx2.mainGroup, 'c', l3, new THREE.Vector3(0.2,0.2,0));
-                    ctx2.mainGroup.add(createPlane(4,4)); addLabel(ctx2.mainGroup, 'α', new THREE.Vector3(-1.5,0,-1.5), new THREE.Vector3(0,0.2,0), 1.2);
+                    ctx2.mainGroup.add(createPlane(4,4,null, 1.0)); addLabel(ctx2.mainGroup, 'α', new THREE.Vector3(-1.5,0,-1.5), new THREE.Vector3(0,0.2,0), 1.2, 1.2);
+                    ctx2.mainGroup.add(createLine(new THREE.Vector3(-2,0,0), l1, matLine, 0.04, 1.8)); addLabel(ctx2.mainGroup, 'a', l1, new THREE.Vector3(0.2,0.2,0), 0.9, 2.0);
+                    ctx2.mainGroup.add(createLine(new THREE.Vector3(-1.5,0,-1.5), l2, matLine, 0.04, 2.4)); addLabel(ctx2.mainGroup, 'b', l2, new THREE.Vector3(0.2,0.2,0), 0.9, 2.6);
+                    ctx2.mainGroup.add(createLine(new THREE.Vector3(-1.5,0,1.5), l3, matLine, 0.04, 3.0)); addLabel(ctx2.mainGroup, 'c', l3, new THREE.Vector3(0.2,0.2,0), 0.9, 3.2);
                 } else {
                     const l1 = new THREE.Vector3(2,0,0), l2 = new THREE.Vector3(0,2,0), l3 = new THREE.Vector3(0,0,2);
-                    ctx2.mainGroup.add(createLine(new THREE.Vector3(-2,0,0), l1)); addLabel(ctx2.mainGroup, 'a', l1, new THREE.Vector3(0.2,0.2,0));
-                    ctx2.mainGroup.add(createLine(new THREE.Vector3(0,-2,0), l2)); addLabel(ctx2.mainGroup, 'b', l2, new THREE.Vector3(0.2,0.2,0));
-                    ctx2.mainGroup.add(createLine(new THREE.Vector3(0,0,-2), l3)); addLabel(ctx2.mainGroup, 'c', l3, new THREE.Vector3(0.2,0.2,0));
+                    ctx2.mainGroup.add(createLine(new THREE.Vector3(-2,0,0), l1, matLine, 0.04, 1.0)); addLabel(ctx2.mainGroup, 'a', l1, new THREE.Vector3(0.2,0.2,0), 0.9, 1.2);
+                    ctx2.mainGroup.add(createLine(new THREE.Vector3(0,-2,0), l2, matLine, 0.04, 1.6)); addLabel(ctx2.mainGroup, 'b', l2, new THREE.Vector3(0.2,0.2,0), 0.9, 1.8);
+                    ctx2.mainGroup.add(createLine(new THREE.Vector3(0,0,-2), l3, matLine, 0.04, 2.2)); addLabel(ctx2.mainGroup, 'c', l3, new THREE.Vector3(0.2,0.2,0), 0.9, 2.4);
                     
-                    // Използваме MeshBasicMaterial за да се виждат равнините отлично и в двата режима (без нужда от осветление на нормалите им)
-                    const matPlane1 = new THREE.MeshBasicMaterial({ color: 0x3b82f6, transparent: true, opacity: 0.4, side: THREE.DoubleSide });
-                    const matPlane2 = new THREE.MeshBasicMaterial({ color: 0xa855f7, transparent: true, opacity: 0.4, side: THREE.DoubleSide });
-                    const matPlane3 = new THREE.MeshBasicMaterial({ color: 0x10b981, transparent: true, opacity: 0.4, side: THREE.DoubleSide });
+                    const matPlane1 = new THREE.MeshBasicMaterial({ color: 0x3b82f6, transparent: true, opacity: 0, side: THREE.DoubleSide });
+                    const matPlane2 = new THREE.MeshBasicMaterial({ color: 0xa855f7, transparent: true, opacity: 0, side: THREE.DoubleSide });
+                    const matPlane3 = new THREE.MeshBasicMaterial({ color: 0x10b981, transparent: true, opacity: 0, side: THREE.DoubleSide });
 
                     const geo1 = new THREE.BufferGeometry().setFromPoints([o, l1, l2]);
                     const geo2 = new THREE.BufferGeometry().setFromPoints([o, l2, l3]);
                     const geo3 = new THREE.BufferGeometry().setFromPoints([o, l3, l1]);
                     
-                    ctx2.mainGroup.add(new THREE.Mesh(geo1, matPlane1), new THREE.Mesh(geo2, matPlane2), new THREE.Mesh(geo3, matPlane3));
-                    addLabel(ctx2.mainGroup, 'α', new THREE.Vector3(1, 1, 0), new THREE.Vector3(0, 0, 0), 1.2);
-                    addLabel(ctx2.mainGroup, 'β', new THREE.Vector3(0, 1, 1), new THREE.Vector3(0, 0, 0), 1.2);
-                    addLabel(ctx2.mainGroup, 'γ', new THREE.Vector3(1, 0, 1), new THREE.Vector3(0, 0, 0), 1.2);
+                    const p1 = new THREE.Mesh(geo1, matPlane1); p1.userData.anim = { type: 'fade', val: 0, target: 0.4, delay: 3.0, speed: 2 };
+                    const p2 = new THREE.Mesh(geo2, matPlane2); p2.userData.anim = { type: 'fade', val: 0, target: 0.4, delay: 3.5, speed: 2 };
+                    const p3 = new THREE.Mesh(geo3, matPlane3); p3.userData.anim = { type: 'fade', val: 0, target: 0.4, delay: 4.0, speed: 2 };
+
+                    ctx2.mainGroup.add(p1, p2, p3);
+                    addLabel(ctx2.mainGroup, 'α', new THREE.Vector3(1, 1, 0), new THREE.Vector3(0, 0, 0), 1.2, 3.2);
+                    addLabel(ctx2.mainGroup, 'β', new THREE.Vector3(0, 1, 1), new THREE.Vector3(0, 0, 0), 1.2, 3.7);
+                    addLabel(ctx2.mainGroup, 'γ', new THREE.Vector3(1, 0, 1), new THREE.Vector3(0, 0, 0), 1.2, 4.2);
                 }
             }
             document.querySelectorAll('input[name="t2"]').forEach(r => r.addEventListener('change', e => updateT2(e.target.value)));
             updateT2('t2_1');
 
-            // Task 3 Logic (4 points)
             function updateT3(val) {
                 if(!ctx3) return;
+                ctx3.time = 0;
                 ctx3.mainGroup.clear();
-                ctx3.mainGroup.add(createFloor(-1.0));
+                ctx3.mainGroup.add(createFloor(-1.0, 0));
+                
                 if(val === 't3_yes') {
-                    const p1 = new THREE.Vector3(-1.5, 0, 0), p2 = new THREE.Vector3(0, 0, 0), p3 = new THREE.Vector3(1.5, 0, 0), p4 = new THREE.Vector3(0, 0, 1.5);
-                    ctx3.mainGroup.add(createPoint(p1.x, p1.y, p1.z)); addLabel(ctx3.mainGroup, 'A', p1);
-                    ctx3.mainGroup.add(createPoint(p2.x, p2.y, p2.z)); addLabel(ctx3.mainGroup, 'B', p2);
-                    ctx3.mainGroup.add(createPoint(p3.x, p3.y, p3.z)); addLabel(ctx3.mainGroup, 'C', p3);
-                    ctx3.mainGroup.add(createPoint(p4.x, p4.y, p4.z)); addLabel(ctx3.mainGroup, 'D', p4);
+                    ctx3.mainGroup.add(createPlane(4,4,null, 0.5)); addLabel(ctx3.mainGroup, 'α', new THREE.Vector3(-1.5,0,-1.5), new THREE.Vector3(0,0.2,0), 1.2, 0.7);
                     const l1 = new THREE.Vector3(2,0,0);
-                    ctx3.mainGroup.add(createLine(new THREE.Vector3(-2,0,0), l1)); addLabel(ctx3.mainGroup, 'a', l1, new THREE.Vector3(0.2,0.2,0));
-                    ctx3.mainGroup.add(createPlane(4,4)); addLabel(ctx3.mainGroup, 'α', new THREE.Vector3(-1.5,0,-1.5), new THREE.Vector3(0,0.2,0), 1.2);
+                    ctx3.mainGroup.add(createLine(new THREE.Vector3(-2,0,0), l1, matLine, 0.04, 1.2)); addLabel(ctx3.mainGroup, 'a', l1, new THREE.Vector3(0.2,0.2,0), 0.9, 1.4);
+                    
+                    const p1 = new THREE.Vector3(-1.5, 0, 0), p2 = new THREE.Vector3(0, 0, 0), p3 = new THREE.Vector3(1.5, 0, 0), p4 = new THREE.Vector3(0, 0, 1.5);
+                    ctx3.mainGroup.add(createPoint(p1.x, p1.y, p1.z, 2.0)); addLabel(ctx3.mainGroup, 'A', p1, undefined, undefined, 2.1);
+                    ctx3.mainGroup.add(createPoint(p2.x, p2.y, p2.z, 2.4)); addLabel(ctx3.mainGroup, 'B', p2, undefined, undefined, 2.5);
+                    ctx3.mainGroup.add(createPoint(p3.x, p3.y, p3.z, 2.8)); addLabel(ctx3.mainGroup, 'C', p3, undefined, undefined, 2.9);
+                    ctx3.mainGroup.add(createPoint(p4.x, p4.y, p4.z, 3.5)); addLabel(ctx3.mainGroup, 'D', p4, undefined, undefined, 3.6);
                 } else {
                     const t1 = new THREE.Vector3(-1, -1, 1), t2 = new THREE.Vector3(1, -1, 1), t3 = new THREE.Vector3(0, -1, -1), t4 = new THREE.Vector3(0, 1.5, 0);
-                    ctx3.mainGroup.add(createPoint(t1.x, t1.y, t1.z)); addLabel(ctx3.mainGroup, 'A', t1, new THREE.Vector3(0,-0.3,0));
-                    ctx3.mainGroup.add(createPoint(t2.x, t2.y, t2.z)); addLabel(ctx3.mainGroup, 'B', t2, new THREE.Vector3(0,-0.3,0));
-                    ctx3.mainGroup.add(createPoint(t3.x, t3.y, t3.z)); addLabel(ctx3.mainGroup, 'C', t3, new THREE.Vector3(0,-0.3,0));
-                    ctx3.mainGroup.add(createPoint(t4.x, t4.y, t4.z)); addLabel(ctx3.mainGroup, 'D', t4);
-                    ctx3.mainGroup.add(createLine(t1, t2, matBaseLine, 0.02), createLine(t2, t3, matBaseLine, 0.02), createLine(t3, t1, matBaseLine, 0.02));
-                    ctx3.mainGroup.add(createLine(t1, t4, matBaseLine, 0.02), createLine(t2, t4, matBaseLine, 0.02), createLine(t3, t4, matBaseLine, 0.02));
+                    ctx3.mainGroup.add(createPoint(t1.x, t1.y, t1.z, 0.5)); addLabel(ctx3.mainGroup, 'A', t1, new THREE.Vector3(0,-0.3,0), 0.9, 0.6);
+                    ctx3.mainGroup.add(createPoint(t2.x, t2.y, t2.z, 0.9)); addLabel(ctx3.mainGroup, 'B', t2, new THREE.Vector3(0,-0.3,0), 0.9, 1.0);
+                    ctx3.mainGroup.add(createPoint(t3.x, t3.y, t3.z, 1.3)); addLabel(ctx3.mainGroup, 'C', t3, new THREE.Vector3(0,-0.3,0), 0.9, 1.4);
+                    ctx3.mainGroup.add(createPoint(t4.x, t4.y, t4.z, 1.7)); addLabel(ctx3.mainGroup, 'D', t4, undefined, undefined, 1.8);
+                    
+                    ctx3.mainGroup.add(createLine(t1, t2, matBaseLine, 0.02, 2.2));
+                    ctx3.mainGroup.add(createLine(t2, t3, matBaseLine, 0.02, 2.4));
+                    ctx3.mainGroup.add(createLine(t3, t1, matBaseLine, 0.02, 2.6));
+                    ctx3.mainGroup.add(createLine(t1, t4, matBaseLine, 0.02, 3.0));
+                    ctx3.mainGroup.add(createLine(t2, t4, matBaseLine, 0.02, 3.2));
+                    ctx3.mainGroup.add(createLine(t3, t4, matBaseLine, 0.02, 3.4));
                 }
             }
             document.querySelectorAll('input[name="t3"]').forEach(r => r.addEventListener('change', e => updateT3(e.target.value)));
             updateT3('t3_no');
 
-            // Task 4 Logic (Room edges)
             function updateT4(val) {
                 if(!ctx4) return;
+                ctx4.time = 0;
                 ctx4.mainGroup.clear();
-                ctx4.mainGroup.add(createFloor(-1.2));
+                ctx4.mainGroup.add(createFloor(-1.2, 0));
                 const v = getCubeV(1.2);
-                drawCubeBase(ctx4.mainGroup, v, true); 
+                let endD = drawCubeBase(ctx4.mainGroup, v, true, 0.5); 
+                
                 if(val === 't4_par') {
-                    ctx4.mainGroup.add(createLine(v.D, v.C, matHigh1, 0.05), createLine(v.D1, v.C1, matHigh1, 0.05));
+                    ctx4.mainGroup.add(createLine(v.D, v.C, matHigh1, 0.05, endD));
+                    ctx4.mainGroup.add(createLine(v.D1, v.C1, matHigh1, 0.05, endD + 0.5));
                 } else if(val === 't4_int') {
-                    ctx4.mainGroup.add(createLine(v.D, v.C, matHigh1, 0.05), createLine(v.D, v.D1, matHigh2, 0.05));
+                    ctx4.mainGroup.add(createLine(v.D, v.C, matHigh1, 0.05, endD));
+                    ctx4.mainGroup.add(createLine(v.D, v.D1, matHigh2, 0.05, endD + 0.5));
                 } else if(val === 't4_skew') {
-                    ctx4.mainGroup.add(createLine(v.D, v.C, matHigh1, 0.05), createLine(v.B, v.B1, matHigh2, 0.05));
+                    ctx4.mainGroup.add(createLine(v.D, v.C, matHigh1, 0.05, endD));
+                    ctx4.mainGroup.add(createLine(v.B, v.B1, matHigh2, 0.05, endD + 0.5));
                 }
             }
             document.querySelectorAll('input[name="t4"]').forEach(r => r.addEventListener('change', e => updateT4(e.target.value)));
             updateT4('t4_par');
 
-            // Task 5 Logic (Cube A1D1)
             function updateT5(val) {
                 if(!ctx5) return;
+                ctx5.time = 0;
                 ctx5.mainGroup.clear();
-                ctx5.mainGroup.add(createFloor(-1.2));
+                ctx5.mainGroup.add(createFloor(-1.2, 0));
                 const v = getCubeV(1.2);
-                drawCubeBase(ctx5.mainGroup, v);
-                ctx5.mainGroup.add(createLine(v.A1, v.D1, matHigh3, 0.07)); // Base edge
+                let endD = drawCubeBase(ctx5.mainGroup, v, false, 0.5);
+                ctx5.mainGroup.add(createLine(v.A1, v.D1, matHigh3, 0.07, endD)); 
                 
                 if(val === 't5_a') {
-                    ctx5.mainGroup.add(createLine(v.A1, v.B1, matHigh1, 0.05), createLine(v.A1, v.A, matHigh1, 0.05));
-                    ctx5.mainGroup.add(createLine(v.D1, v.C1, matHigh1, 0.05), createLine(v.D1, v.D, matHigh1, 0.05));
+                    ctx5.mainGroup.add(createLine(v.A1, v.B1, matHigh1, 0.05, endD + 0.6));
+                    ctx5.mainGroup.add(createLine(v.A1, v.A, matHigh1, 0.05, endD + 0.8));
+                    ctx5.mainGroup.add(createLine(v.D1, v.C1, matHigh1, 0.05, endD + 1.0));
+                    ctx5.mainGroup.add(createLine(v.D1, v.D, matHigh1, 0.05, endD + 1.2));
                 } else if(val === 't5_b') {
-                    ctx5.mainGroup.add(createLine(v.A, v.D, matHigh2, 0.05), createLine(v.B, v.C, matHigh2, 0.05), createLine(v.B1, v.C1, matHigh2, 0.05));
+                    ctx5.mainGroup.add(createLine(v.A, v.D, matHigh2, 0.05, endD + 0.6));
+                    ctx5.mainGroup.add(createLine(v.B, v.C, matHigh2, 0.05, endD + 0.8));
+                    ctx5.mainGroup.add(createLine(v.B1, v.C1, matHigh2, 0.05, endD + 1.0));
                 } else if(val === 't5_c') {
-                    ctx5.mainGroup.add(createLine(v.A, v.B, matHigh1, 0.05), createLine(v.D, v.C, matHigh1, 0.05));
-                    ctx5.mainGroup.add(createLine(v.B, v.B1, matHigh1, 0.05), createLine(v.C, v.C1, matHigh1, 0.05));
+                    ctx5.mainGroup.add(createLine(v.A, v.B, matHigh1, 0.05, endD + 0.6));
+                    ctx5.mainGroup.add(createLine(v.D, v.C, matHigh1, 0.05, endD + 0.8));
+                    ctx5.mainGroup.add(createLine(v.B, v.B1, matHigh1, 0.05, endD + 1.0));
+                    ctx5.mainGroup.add(createLine(v.C, v.C1, matHigh1, 0.05, endD + 1.2));
                 }
             }
             document.querySelectorAll('input[name="t5"]').forEach(r => r.addEventListener('change', e => updateT5(e.target.value)));
             updateT5('t5_a');
 
-            // Task 6 Logic (Tetrahedron skew)
             function updateT6(val) {
                 if(!ctx6) return;
+                ctx6.time = 0;
                 ctx6.mainGroup.clear();
-                ctx6.mainGroup.add(createFloor(-1.0));
+                ctx6.mainGroup.add(createFloor(-1.0, 0));
                 const v = { A: new THREE.Vector3(-1,-1,1), B: new THREE.Vector3(1,-1,1), C: new THREE.Vector3(0,-1,-1), D: new THREE.Vector3(0,1.5,0) };
                 
-                ctx6.mainGroup.add(createLine(v.A, v.B, matBaseLine, 0.02), createLine(v.B, v.C, matBaseLine, 0.02), createLine(v.C, v.A, matBaseLine, 0.02));
-                ctx6.mainGroup.add(createLine(v.A, v.D, matBaseLine, 0.02), createLine(v.B, v.D, matBaseLine, 0.02), createLine(v.C, v.D, matBaseLine, 0.02));
+                ctx6.mainGroup.add(createLine(v.A, v.B, matBaseLine, 0.02, 0.5));
+                ctx6.mainGroup.add(createLine(v.B, v.C, matBaseLine, 0.02, 0.6));
+                ctx6.mainGroup.add(createLine(v.C, v.A, matBaseLine, 0.02, 0.7));
+                ctx6.mainGroup.add(createLine(v.A, v.D, matBaseLine, 0.02, 0.8));
+                ctx6.mainGroup.add(createLine(v.B, v.D, matBaseLine, 0.02, 0.9));
+                ctx6.mainGroup.add(createLine(v.C, v.D, matBaseLine, 0.02, 1.0));
                 
-                for(let k in v) { ctx6.mainGroup.add(createPoint(v[k].x, v[k].y, v[k].z)); }
-                for(let k in v) {
-                    addLabel(ctx6.mainGroup, k, v[k], new THREE.Vector3(0, k==='D'?0.3:-0.3, 0), 0.8);
-                }
+                for(let k in v) { ctx6.mainGroup.add(createPoint(v[k].x, v[k].y, v[k].z, 1.2)); }
+                for(let k in v) { addLabel(ctx6.mainGroup, k, v[k], new THREE.Vector3(0, k==='D'?0.3:-0.3, 0), 0.8, 1.4); }
 
+                let endD = 2.0;
                 if(val === 't6_1') {
-                    ctx6.mainGroup.add(createLine(v.A, v.B, matHigh1, 0.06), createLine(v.C, v.D, matHigh2, 0.06));
+                    ctx6.mainGroup.add(createLine(v.A, v.B, matHigh1, 0.06, endD));
+                    ctx6.mainGroup.add(createLine(v.C, v.D, matHigh2, 0.06, endD + 0.5));
                 } else if(val === 't6_2') {
-                    ctx6.mainGroup.add(createLine(v.A, v.C, matHigh1, 0.06), createLine(v.B, v.D, matHigh2, 0.06));
+                    ctx6.mainGroup.add(createLine(v.A, v.C, matHigh1, 0.06, endD));
+                    ctx6.mainGroup.add(createLine(v.B, v.D, matHigh2, 0.06, endD + 0.5));
                 } else if(val === 't6_3') {
-                    ctx6.mainGroup.add(createLine(v.A, v.D, matHigh1, 0.06), createLine(v.B, v.C, matHigh2, 0.06));
+                    ctx6.mainGroup.add(createLine(v.A, v.D, matHigh1, 0.06, endD));
+                    ctx6.mainGroup.add(createLine(v.B, v.C, matHigh2, 0.06, endD + 0.5));
                 }
             }
             document.querySelectorAll('input[name="t6"]').forEach(r => r.addEventListener('change', e => updateT6(e.target.value)));
             updateT6('t6_1');
 
-            // Task 7 Logic (Angles and Sectors)
             function updateT7(val) {
                 if(!ctx7) return;
+                ctx7.time = 0;
                 ctx7.mainGroup.clear();
-                ctx7.mainGroup.add(createFloor(-1.2));
+                ctx7.mainGroup.add(createFloor(-1.2, 0));
                 const v = getCubeV(1.2);
-                drawCubeBase(ctx7.mainGroup, v);
+                let endD = drawCubeBase(ctx7.mainGroup, v, false, 0.5);
 
                 if(val === 't7_a') {
-                    ctx7.mainGroup.add(createLine(v.A, v.B1, matHigh1, 0.05), createLine(v.C, v.C1, matHigh2, 0.05));
-                    ctx7.mainGroup.add(createLine(v.B, v.B1, matHigh3, 0.04), createLine(v.A, v.B, matBaseLine, 0.02)); // Translation BB1 and base triangle
+                    ctx7.mainGroup.add(createLine(v.A, v.B1, matHigh1, 0.05, endD));
+                    ctx7.mainGroup.add(createLine(v.C, v.C1, matHigh2, 0.05, endD + 0.5));
                     
-                    // Изчертаваме маркировката за ъгъл (сектор) при B1
-                    ctx7.mainGroup.add(createSector(v.B1, v.A, v.B, 0.5, 0xeab308));
+                    ctx7.mainGroup.add(createLine(v.B, v.B1, matHigh3, 0.04, endD + 1.5)); 
+                    ctx7.mainGroup.add(createLine(v.A, v.B, matBaseLine, 0.02, endD + 1.5));
                     
-                    // Позициониране чрез ъглополовяща
+                    ctx7.mainGroup.add(createSector(v.B1, v.A, v.B, 0.5, 0xeab308, endD + 2.5));
+                    
                     let vA = v.A.clone().sub(v.B1).normalize();
                     let vB = v.B.clone().sub(v.B1).normalize();
                     if (vA.dot(vB) < 0) vB.negate();
                     let bisector = vA.add(vB).normalize();
-                    let labelPos = v.B1.clone().add(bisector.multiplyScalar(0.75)); // радиусът е 0.5
+                    let labelPos = v.B1.clone().add(bisector.multiplyScalar(0.75)); 
                     
-                    addLabel(ctx7.mainGroup, "45°", labelPos, new THREE.Vector3(0, 0, 0), 0.7);
+                    addLabel(ctx7.mainGroup, "45°", labelPos, new THREE.Vector3(0, 0, 0), 0.7, endD + 3.2);
                 } else if(val === 't7_b') {
-                    ctx7.mainGroup.add(createLine(v.A, v.C, matHigh1, 0.05), createLine(v.B1, v.D1, matHigh2, 0.05));
-                    ctx7.mainGroup.add(createLine(v.B, v.D, matHigh3, 0.04)); // Translation BD
+                    ctx7.mainGroup.add(createLine(v.A, v.C, matHigh1, 0.05, endD));
+                    ctx7.mainGroup.add(createLine(v.B1, v.D1, matHigh2, 0.05, endD + 0.5));
+                    
+                    ctx7.mainGroup.add(createLine(v.B, v.D, matHigh3, 0.04, endD + 1.5));
                     
                     const centerO = new THREE.Vector3(0, -1.2, 0);
-                    // Изчертаваме маркировката за ъгъл (сектор) при пресечната точка O
-                    ctx7.mainGroup.add(createSector(centerO, v.B, v.C, 0.6, 0xeab308));
+                    ctx7.mainGroup.add(createSector(centerO, v.B, v.C, 0.6, 0xeab308, endD + 2.5));
                     
-                    // Позициониране чрез ъглополовяща
                     let vA = v.B.clone().sub(centerO).normalize();
                     let vB = v.C.clone().sub(centerO).normalize();
                     if (vA.dot(vB) < 0) vB.negate();
                     let bisector = vA.add(vB).normalize();
-                    let labelPos = centerO.clone().add(bisector.multiplyScalar(0.85)); // радиусът е 0.6
+                    let labelPos = centerO.clone().add(bisector.multiplyScalar(0.85)); 
                     
-                    addLabel(ctx7.mainGroup, "90°", labelPos, new THREE.Vector3(0, 0, 0), 0.7);
+                    addLabel(ctx7.mainGroup, "90°", labelPos, new THREE.Vector3(0, 0, 0), 0.7, endD + 3.2);
                 }
             }
             document.querySelectorAll('input[name="t7"]').forEach(r => r.addEventListener('change', e => updateT7(e.target.value)));
             updateT7('t7_a');
             
-            // Включваме автоматично въртене за всички задачи, за да се вижда 3D ефектът веднага
             [ctx1, ctx2, ctx3, ctx4, ctx5, ctx6, ctx7].forEach(ctx => {
                 if (ctx && ctx.controls) {
                     ctx.controls.autoRotate = true;
@@ -1678,28 +1614,29 @@
             });
         }
 
-        // Animation Loop
+        // --- Главна анимационна логика ---
         function animate() {
             requestAnimationFrame(animate);
+            const delta = globalClock.getDelta();
             
-            // Анимация за клатещата се маса (Задача 1)
+            // Вълнението на масата
             if (scenes.length > 0) {
                 const ctx1 = scenes.find(s => s.container && s.container.id === 'task1-canvas');
                 if (ctx1 && ctx1.isWobbling && ctx1.tableGrp) {
-                    ctx1.wobbleTime += 0.08;
+                    ctx1.wobbleTime = (ctx1.wobbleTime || 0) + delta * 5;
                     const rock = Math.sin(ctx1.wobbleTime);
-                    const angle = rock > 0 ? rock * 0.15 : 0; // Остава стабилна за половин цикъл, когато опре в пода
+                    const angle = rock > 0 ? rock * 0.15 : 0; 
                     ctx1.tableGrp.setRotationFromAxisAngle(new THREE.Vector3(1, 0, 1).normalize(), angle);
                 }
             }
 
-            scenes.forEach(({ scene, camera, renderer, controls }) => {
-                if (controls) controls.update();
-                if (renderer && scene && camera) renderer.render(scene, camera);
+            scenes.forEach(ctx => {
+                if (ctx.controls) ctx.controls.update();
+                updateAnimations(ctx, delta);
+                if (ctx.renderer && ctx.scene && ctx.camera) ctx.renderer.render(ctx.scene, ctx.camera);
             });
         }
 
-        // Handle Window Resize
         window.addEventListener('resize', () => {
             scenes.forEach(({ camera, renderer, container }) => {
                 if (camera && renderer && container) {
@@ -1710,13 +1647,11 @@
             });
         });
 
-        // Initialize Everything on Load securely
         window.addEventListener('load', function() {
             try {
                 if (window.lucide) lucide.createIcons();
                 initQuizzes();
                 
-                // Init 3D Scenes
                 initBasicObjects();
                 initNotations();
                 initAxioms();
@@ -1726,7 +1661,6 @@
                 initTheorems();
                 initTasks(); 
 
-                // Start rendering
                 animate();
             } catch (error) {
                 console.error("Грешка при зареждане на чертежите:", error);
