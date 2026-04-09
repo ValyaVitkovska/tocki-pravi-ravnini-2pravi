@@ -84,6 +84,10 @@
             position: relative; cursor: grab;
             box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.1);
             border: 1px solid #e2e8f0;
+            touch-action: none; /* Позволява 3D въртене без да скролира страницата */
+        }
+        @media (max-width: 768px) {
+            .canvas-container { height: 300px; } /* Малко по-компактни за мобилни екрани */
         }
         .canvas-container:active { cursor: grabbing; }
         .canvas-overlay {
@@ -811,17 +815,38 @@
         const scenes = [];
         let globalClock = new THREE.Clock();
 
+        // По-надеждно преоразмеряване за мобилни устройства и завъртане на екрана
+        const canvasResizeObserver = new ResizeObserver(entries => {
+            for (let entry of entries) {
+                const container = entry.target;
+                const sceneData = scenes.find(s => s.container === container);
+                if (sceneData && sceneData.camera && sceneData.renderer) {
+                    const width = entry.contentRect.width;
+                    const height = entry.contentRect.height;
+                    if (width > 0 && height > 0) {
+                        sceneData.camera.aspect = width / height;
+                        sceneData.camera.updateProjectionMatrix();
+                        sceneData.renderer.setSize(width, height);
+                    }
+                }
+            }
+        });
+
         function createBaseScene(containerId) {
             const container = document.getElementById(containerId);
             if (!container) return null;
             
+            const width = container.clientWidth || 300;
+            const height = container.clientHeight || 300;
+
             const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
+            const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
             camera.position.set(4, 4, 6);
 
             const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-            renderer.setSize(container.clientWidth, container.clientHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(width, height);
+            // КРИТИЧНО ЗА ТЕЛЕФОНИ: Ограничаваме pixelRatio до 2, за да не крашва мобилният графичен процесор!
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); 
             container.appendChild(renderer.domElement);
 
             const controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -839,6 +864,9 @@
 
             const sceneData = { scene, camera, renderer, controls, container, mainGroup, time: 0 };
             scenes.push(sceneData);
+            
+            canvasResizeObserver.observe(container); // Активираме автоматичното преоразмеряване
+            
             return sceneData;
         }
 
@@ -1637,17 +1665,8 @@
             });
         }
 
-        window.addEventListener('resize', () => {
-            scenes.forEach(({ camera, renderer, container }) => {
-                if (camera && renderer && container) {
-                    camera.aspect = container.clientWidth / container.clientHeight;
-                    camera.updateProjectionMatrix();
-                    renderer.setSize(container.clientWidth, container.clientHeight);
-                }
-            });
-        });
-
-        window.addEventListener('load', function() {
+        // Използваме DOMContentLoaded вместо load, за да стартират по-бързо на по-бавни мобилни връзки
+        document.addEventListener('DOMContentLoaded', function() {
             try {
                 if (window.lucide) lucide.createIcons();
                 initQuizzes();
