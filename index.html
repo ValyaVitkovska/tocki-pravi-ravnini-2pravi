@@ -93,6 +93,7 @@
         .canvas-overlay {
             position: absolute; bottom: 10px; left: 10px; color: rgba(255,255,255,0.9);
             font-size: 0.875rem; pointer-events: none; background: rgba(0,0,0,0.6); padding: 4px 8px; border-radius: 4px;
+            z-index: 10;
         }
 
         html.dark .canvas-container {
@@ -815,7 +816,7 @@
         const scenes = [];
         let globalClock = new THREE.Clock();
 
-        // По-надеждно преоразмеряване за мобилни устройства и завъртане на екрана
+        // 1. Resize Observer за преоразмеряване при завъртане на екрана
         const canvasResizeObserver = new ResizeObserver(entries => {
             for (let entry of entries) {
                 const container = entry.target;
@@ -832,6 +833,60 @@
             }
         });
 
+        // 2. IntersectionObserver - КЛЮЧЪТ КЪМ ОПТИМИЗАЦИЯТА НА ПАМЕТТА ЗА МОБИЛНИ!
+        // Зареждаме и унищожаваме WebGL контекстите динамично, само когато са видими.
+        const sceneObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const ctx = scenes.find(s => s.container === entry.target);
+                if (!ctx) return;
+
+                if (entry.isIntersecting) {
+                    // Създаваме контекст само ако е видим на екрана
+                    if (!ctx.renderer) {
+                        ctx.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+                        const width = entry.target.clientWidth || 300;
+                        const height = entry.target.clientHeight || 300;
+                        ctx.renderer.setSize(width, height);
+                        ctx.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                        
+                        ctx.renderer.domElement.style.position = 'absolute';
+                        ctx.renderer.domElement.style.top = '0';
+                        ctx.renderer.domElement.style.left = '0';
+                        
+                        // Добавяме го най-отдолу, за да не закрива overlay текста
+                        entry.target.insertBefore(ctx.renderer.domElement, entry.target.firstChild);
+
+                        ctx.controls = new THREE.OrbitControls(ctx.camera, ctx.renderer.domElement);
+                        ctx.controls.enableDamping = true;
+                        ctx.controls.dampingFactor = 0.05;
+                        
+                        if (ctx.needsAutoRotate) {
+                            ctx.controls.autoRotate = true;
+                            ctx.controls.autoRotateSpeed = 1.0;
+                        }
+                    }
+                } else {
+                    // АКО ИЗЛЕЗЕ ОТ ЕКРАНА - ЗАДЪЛЖИТЕЛНО ОСВОБОЖДАВАМЕ ПАМЕТТА
+                    if (ctx.renderer) {
+                        entry.target.removeChild(ctx.renderer.domElement);
+                        
+                        // Форсираме освобождаването, за да заобиколим лимитите на браузъра
+                        const gl = ctx.renderer.getContext();
+                        const extension = gl.getExtension('WEBGL_lose_context');
+                        if (extension) extension.loseContext();
+                        
+                        ctx.renderer.dispose();
+                        ctx.renderer = null;
+
+                        if (ctx.controls) {
+                            ctx.controls.dispose();
+                            ctx.controls = null;
+                        }
+                    }
+                }
+            });
+        }, { rootMargin: '250px' }); // Буфер: Зарежда се малко преди да скролнете до него
+
         function createBaseScene(containerId) {
             const container = document.getElementById(containerId);
             if (!container) return null;
@@ -843,16 +898,6 @@
             const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
             camera.position.set(4, 4, 6);
 
-            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-            renderer.setSize(width, height);
-            // КРИТИЧНО ЗА ТЕЛЕФОНИ: Ограничаваме pixelRatio до 2, за да не крашва мобилният графичен процесор!
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); 
-            container.appendChild(renderer.domElement);
-
-            const controls = new THREE.OrbitControls(camera, renderer.domElement);
-            controls.enableDamping = true;
-            controls.dampingFactor = 0.05;
-
             const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
             scene.add(ambientLight);
             const dirLight = new THREE.DirectionalLight(0xffffff, 0.5);
@@ -862,16 +907,17 @@
             const mainGroup = new THREE.Group();
             scene.add(mainGroup);
 
-            const sceneData = { scene, camera, renderer, controls, container, mainGroup, time: 0 };
+            // Забележете: renderer и controls вече са null. Observer-ът ще ги създаде!
+            const sceneData = { scene, camera, renderer: null, controls: null, container, mainGroup, time: 0, needsAutoRotate: false };
             scenes.push(sceneData);
             
-            canvasResizeObserver.observe(container); // Активираме автоматичното преоразмеряване
+            canvasResizeObserver.observe(container);
+            sceneObserver.observe(container); // Наблюдаваме кога ще се покаже на екрана
             
             return sceneData;
         }
 
         // --- Материалите тип "Тебешир/Маркер" ---
-        // Използваме MeshPhongMaterial с shininess: 0 за матов ефект
         const matPoint = new THREE.MeshPhongMaterial({ color: 0xef4444, shininess: 0 }); // Red
         const matLine = new THREE.MeshPhongMaterial({ color: 0x3b82f6, shininess: 0 });  // Blue
         const matLineAlt = new THREE.MeshPhongMaterial({ color: 0x10b981, shininess: 0 }); // Green
@@ -891,15 +937,14 @@
             const geo = new THREE.SphereGeometry(0.12, 16, 16);
             const mesh = new THREE.Mesh(geo, matPoint);
             mesh.position.set(x, y, z);
-            mesh.scale.setScalar(0.001); // Стартираме скрити
-            mesh.userData.anim = { type: 'pop', val: 0, target: 1, delay: delay, speed: 4 }; // Speed multiplier
+            mesh.scale.setScalar(0.001); 
+            mesh.userData.anim = { type: 'pop', val: 0, target: 1, delay: delay, speed: 4 }; 
             return mesh;
         }
 
         function createLine(p1, p2, material = matLine, thickness = 0.04, delay = 0) {
             const distance = p1.distanceTo(p2);
             const geo = new THREE.CylinderGeometry(thickness, thickness, distance, 12);
-            // Преместваме центъра в началото, за да расте от p1 към p2
             geo.translate(0, distance / 2, 0); 
             
             const mesh = new THREE.Mesh(geo, material);
@@ -916,9 +961,9 @@
 
         function createPlane(w, h, colorHex = null, delay = 0) {
             const geo = new THREE.PlaneGeometry(w, h);
-            const mat = baseMatPlane.clone(); // Уникален за всяка равнина за индивидуална opacity
+            const mat = baseMatPlane.clone(); 
             if(colorHex) mat.color.setHex(colorHex);
-            mat.opacity = 0; // Започва скрита
+            mat.opacity = 0; 
             const mesh = new THREE.Mesh(geo, mat);
             mesh.rotation.x = -Math.PI / 2;
             mesh.userData.anim = { type: 'fade', val: 0, target: 0.4, delay: delay, speed: 1.5 };
@@ -929,7 +974,6 @@
             const canvas = document.createElement('canvas');
             canvas.width = 256; canvas.height = 256;
             const ctx = canvas.getContext('2d');
-            // Използваме ръкописен шрифт за ефекта
             ctx.font = "italic bold 100px 'Caveat', 'Comic Sans MS', cursive, sans-serif"; 
             ctx.fillStyle = document.documentElement.classList.contains('dark') ? '#f8fafc' : '#0f172a';
             ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
@@ -970,7 +1014,7 @@
             const curve = new THREE.EllipseCurve(0, 0, radius, radius, 0, angle, false, 0);
             const points = curve.getPoints(32);
             const lineGeo = new THREE.BufferGeometry().setFromPoints(points);
-            lineGeo.setDrawRange(0, 0); // Старт на чертането: 0 точки
+            lineGeo.setDrawRange(0, 0); 
             const lineMat = new THREE.LineBasicMaterial({ color: colorHex, linewidth: 3 });
             const arc = new THREE.Line(lineGeo, lineMat);
             arc.applyMatrix4(matrix);
@@ -981,7 +1025,6 @@
             return group;
         }
 
-        // Основният енджин за анимация на чертането
         function updateAnimations(sceneData, delta) {
             if (!sceneData || !sceneData.mainGroup) return;
             sceneData.time += delta;
@@ -995,7 +1038,6 @@
                             if (anim.val > anim.target) anim.val = anim.target;
                             
                             if (anim.type === 'pop') {
-                                // Пружиниращ ефект за точките
                                 const bounce = Math.sin(anim.val * Math.PI) * 0.3;
                                 child.scale.setScalar(Math.max(0.001, anim.val + bounce));
                             } else if (anim.type === 'grow') {
@@ -1034,7 +1076,7 @@
         function initBasicObjects() {
             const ctx = createBaseScene('basic-objects-canvas');
             if (!ctx) return;
-            ctx.time = 0; // Reset time
+            ctx.time = 0; 
             const { mainGroup } = ctx;
             
             const ptA = new THREE.Vector3(1, -1, 1);
@@ -1367,7 +1409,7 @@
                         if (!(p1==='A' && p2==='A1')) return; 
                     }
                     grp.add(createLine(v[p1], v[p2], matBaseLine, 0.02, d));
-                    d += 0.08; // Рисува ръбовете бързо един след друг
+                    d += 0.08; 
                 });
                 for(let k in v) { 
                     grp.add(createPoint(v[k].x, v[k].y, v[k].z, d)); 
@@ -1411,7 +1453,7 @@
                     tableGrp.add(createLine(p1, new THREE.Vector3(p1.x, 0.5, p1.z), matBaseLine, 0.04, 0.5));
                     tableGrp.add(createLine(p2, new THREE.Vector3(p2.x, 0.5, p2.z), matBaseLine, 0.04, 0.7));
                     tableGrp.add(createLine(p3, new THREE.Vector3(p3.x, 0.5, p3.z), matBaseLine, 0.04, 0.9));
-                    tableGrp.add(createLine(p4, new THREE.Vector3(p4.x, 0.5, p4.z), matHigh1, 0.04, 1.1)); // Short leg in red
+                    tableGrp.add(createLine(p4, new THREE.Vector3(p4.x, 0.5, p4.z), matHigh1, 0.04, 1.1)); 
                     
                     tableGrp.add(createPoint(p1.x, p1.y, p1.z, 1.5)); addLabel(tableGrp, 'A', p1, new THREE.Vector3(0,-0.3,0), 0.9, 1.6);
                     tableGrp.add(createPoint(p2.x, p2.y, p2.z, 1.5)); addLabel(tableGrp, 'B', p2, new THREE.Vector3(0,-0.3,0), 0.9, 1.6);
@@ -1635,9 +1677,12 @@
             updateT7('t7_a');
             
             [ctx1, ctx2, ctx3, ctx4, ctx5, ctx6, ctx7].forEach(ctx => {
-                if (ctx && ctx.controls) {
-                    ctx.controls.autoRotate = true;
-                    ctx.controls.autoRotateSpeed = 1.0;
+                if (ctx) {
+                    ctx.needsAutoRotate = true; // Ще се задейства, когато Observer-ът ги създаде
+                    if (ctx.controls) {
+                        ctx.controls.autoRotate = true;
+                        ctx.controls.autoRotateSpeed = 1.0;
+                    }
                 }
             });
         }
@@ -1647,7 +1692,6 @@
             requestAnimationFrame(animate);
             const delta = globalClock.getDelta();
             
-            // Вълнението на масата
             if (scenes.length > 0) {
                 const ctx1 = scenes.find(s => s.container && s.container.id === 'task1-canvas');
                 if (ctx1 && ctx1.isWobbling && ctx1.tableGrp) {
@@ -1658,14 +1702,16 @@
                 }
             }
 
+            // Рендерираме само тези, които ИМАТ renderer (т.е. са на екрана)
             scenes.forEach(ctx => {
-                if (ctx.controls) ctx.controls.update();
-                updateAnimations(ctx, delta);
-                if (ctx.renderer && ctx.scene && ctx.camera) ctx.renderer.render(ctx.scene, ctx.camera);
+                if (ctx.renderer) {
+                    if (ctx.controls) ctx.controls.update();
+                    updateAnimations(ctx, delta);
+                    ctx.renderer.render(ctx.scene, ctx.camera);
+                }
             });
         }
 
-        // Използваме DOMContentLoaded вместо load, за да стартират по-бързо на по-бавни мобилни връзки
         document.addEventListener('DOMContentLoaded', function() {
             try {
                 if (window.lucide) lucide.createIcons();
