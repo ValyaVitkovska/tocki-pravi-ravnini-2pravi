@@ -36,7 +36,7 @@
                 displayMath: [['$$', '$$'], ['\\[', '\\]']],
                 processEscapes: true
             },
-            startup: { typeset: false }
+            startup: { typeset: true }
         };
     </script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -81,13 +81,21 @@
 
         .canvas-container {
             width: 100%; height: 350px; border-radius: 0.5rem; overflow: hidden;
-            background-color: #0f172a; position: relative; cursor: grab;
-            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.5);
+            background-color: #f8fafc; /* Светъл фон за добър контраст */
+            position: relative; cursor: grab;
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
         }
         .canvas-container:active { cursor: grabbing; }
         .canvas-overlay {
-            position: absolute; bottom: 10px; left: 10px; color: rgba(255,255,255,0.8);
-            font-size: 0.875rem; pointer-events: none; background: rgba(0,0,0,0.5); padding: 4px 8px; border-radius: 4px;
+            position: absolute; bottom: 10px; left: 10px; color: rgba(255,255,255,0.9);
+            font-size: 0.875rem; pointer-events: none; background: rgba(0,0,0,0.6); padding: 4px 8px; border-radius: 4px;
+        }
+
+        html.dark .canvas-container {
+            background-color: #1e293b; /* Специфичен тъмен фон, открояващ тъмни и светли линии */
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.5);
+            border-color: #334155;
         }
 
         .glass-card {
@@ -170,7 +178,7 @@
 
         <!-- Credits Image -->
         <div class="text-center mb-8">
-            <img src="TPR.png" alt="Точки, прави и равнини в пространството" class="mx-auto rounded-xl shadow-lg max-h-\[28rem\] w-full max-w-4xl object-cover mb-4 border-2 border-white dark:border-slate-700" onerror="this.src='TPR.jpg'; this.onerror=function(){this.style.display='none'};">
+            <img src="TPR.png" alt="Точки, прави и равнини в пространството" class="mx-auto rounded-xl shadow-lg max-h-[28rem] w-full max-w-4xl object-cover mb-4 border-2 border-white dark:border-slate-700" onerror="this.style.display='none';">
             <p class="text-base text-gray-700 dark:text-gray-300 font-medium bg-white/50 dark:bg-slate-900/50 inline-block px-4 py-2 rounded-full backdrop-blur-sm border border-gray-200 dark:border-slate-700">Идея и педагогически решения: Валя Витковска &nbsp;|&nbsp; Създаден с Gemini и ChatGPT</p>
         </div>
 
@@ -413,7 +421,7 @@
 
                     <div class="space-y-4">
                         <label class="flex items-start p-4 rounded-lg cursor-pointer btn-3d">
-                            <input type="radio" name="linePosition" value="intersecting" class="mt-1 mr-4 w-5 h-5 accent-blue-600">
+                            <input type="radio" name="linePosition" value="intersecting" class="mt-1 mr-4 w-5 h-5 accent-blue-600" checked>
                             <div>
                                 <h4 class="font-bold text-gray-900 dark:text-white text-lg">Пресичащи се прави</h4>
                                 <p class="text-base text-gray-800 dark:text-gray-300 mt-1">Лежат в една равнина и имат точно една обща точка.</p>
@@ -421,7 +429,7 @@
                         </label>
 
                         <label class="flex items-start p-4 rounded-lg cursor-pointer btn-3d">
-                            <input type="radio" name="linePosition" value="parallel" class="mt-1 mr-4 w-5 h-5 accent-blue-600" checked>
+                            <input type="radio" name="linePosition" value="parallel" class="mt-1 mr-4 w-5 h-5 accent-blue-600">
                             <div>
                                 <h4 class="font-bold text-gray-900 dark:text-white text-lg">Успоредни прави</h4>
                                 <p class="text-base text-gray-800 dark:text-gray-300 mt-1">Лежат в една равнина и нямат обща точка.</p>
@@ -435,6 +443,14 @@
                                 <p class="text-base text-gray-800 dark:text-gray-300 mt-1"><strong>Не лежат в една равнина</strong> и нямат обща точка.</p>
                             </div>
                         </label>
+
+                        <label class="flex items-start p-4 rounded-lg cursor-pointer btn-3d">
+                            <input type="radio" name="linePosition" value="skew_criterion" class="mt-1 mr-4 w-5 h-5 accent-blue-600">
+                            <div>
+                                <h4 class="font-bold text-gray-900 dark:text-white text-lg">Критерий за кръстосани прави</h4>
+                                <p class="text-base text-gray-800 dark:text-gray-300 mt-1">Ако едната права лежи в равнина, а другата я пробожда в точка извън първата права, то те са кръстосани.</p>
+                            </div>
+                        </label>
                     </div>
                 </div>
 
@@ -446,722 +462,1276 @@
             </div>
         </section>
 
-        <!-- SECTION V: Parallel Lines -->
-        <section class="glass-card relative">
-            <div class="flex flex-wrap justify-between items-center mb-4 gap-4 border-b border-gray-200 dark:border-slate-700 pb-2">
-                <h2 class="text-2xl font-bold accent-gradient m-0">V. Успоредни прави: Свойства и Теореми</h2>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center mb-6">
+        <!-- SECTION V: Angle between skew lines -->
+        <section class="glass-card">
+            <h2 class="text-2xl font-bold mb-4 accent-gradient border-b border-gray-200 dark:border-slate-700 pb-2">V. Ъгъл между кръстосани прави</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
                 <div>
+                    <p class="mb-6 text-lg text-gray-800 dark:text-gray-200 font-medium">Тъй като кръстосаните прави не се пресичат, ъгълът между тях се намира чрез <strong>успоредно пренасяне (транслация)</strong>, докато се пресекат.</p>
+
                     <div class="space-y-4">
                         <label class="flex items-start p-4 rounded-lg cursor-pointer btn-3d">
-                            <input type="radio" name="parallelThm" value="th1" class="mt-1 mr-4 w-5 h-5 accent-blue-600" checked>
+                            <input type="radio" name="angleSkewType" value="step1" class="mt-1 mr-4 w-5 h-5 accent-blue-600" checked>
                             <div>
-                                <h4 class="font-bold text-gray-900 dark:text-white text-lg">Теорема 1 (Основно свойство)</h4>
-                                <p class="text-base text-gray-800 dark:text-gray-300 mt-1">През точка, нележаща на дадена права, минава точно една права, успоредна на дадената.</p>
+                                <h4 class="font-bold text-gray-900 dark:text-white text-lg">Стъпка 1: Дадени кръстосани прави</h4>
+                                <p class="text-base text-gray-800 dark:text-gray-300 mt-1">Имаме две кръстосани прави $a$ и $b$, които се разминават в пространството.</p>
                             </div>
                         </label>
 
                         <label class="flex items-start p-4 rounded-lg cursor-pointer btn-3d">
-                            <input type="radio" name="parallelThm" value="th2" class="mt-1 mr-4 w-5 h-5 accent-blue-600">
+                            <input type="radio" name="angleSkewType" value="step2" class="mt-1 mr-4 w-5 h-5 accent-blue-600">
                             <div>
-                                <h4 class="font-bold text-gray-900 dark:text-white text-lg">Теорема 2 (Транзитивност)</h4>
-                                <p class="text-base text-gray-800 dark:text-gray-300 mt-1">Ако две прави са поотделно успоредни на трета, то те са успоредни помежду си. ($a \parallel c$ и $b \parallel c \Rightarrow a \parallel b$).</p>
+                                <h4 class="font-bold text-gray-900 dark:text-white text-lg">Стъпка 2: Избор на точка</h4>
+                                <p class="text-base text-gray-800 dark:text-gray-300 mt-1">Избираме произволна точка $M$. Най-удобно е тя да лежи върху едната от правите (например върху $a$).</p>
+                            </div>
+                        </label>
+
+                        <label class="flex items-start p-4 rounded-lg cursor-pointer btn-3d">
+                            <input type="radio" name="angleSkewType" value="step3" class="mt-1 mr-4 w-5 h-5 accent-blue-600">
+                            <div>
+                                <h4 class="font-bold text-gray-900 dark:text-white text-lg">Стъпка 3: Успоредно пренасяне</h4>
+                                <p class="text-base text-gray-800 dark:text-gray-300 mt-1">През точката $M$ построяваме нова права $b_1$, която е успоредна на правата $b$.</p>
+                            </div>
+                        </label>
+
+                        <label class="flex items-start p-4 rounded-lg cursor-pointer btn-3d">
+                            <input type="radio" name="angleSkewType" value="step4" class="mt-1 mr-4 w-5 h-5 accent-blue-600">
+                            <div>
+                                <h4 class="font-bold text-gray-900 dark:text-white text-lg">Стъпка 4: Ъгълът</h4>
+                                <p class="text-base text-gray-800 dark:text-gray-300 mt-1">Търсеният ъгъл между кръстосаните прави $a$ и $b$ е равен на ъгъла $\varphi$ между вече пресичащите се прави $a$ и $b_1$.</p>
                             </div>
                         </label>
                     </div>
                 </div>
 
                 <div class="flex flex-col">
-                    <div id="parallel-canvas" class="canvas-container">
+                    <div id="angle-skew-canvas" class="canvas-container">
                         <div class="canvas-overlay"><i data-lucide="rotate-3d" class="inline w-4 h-4 mr-1"></i> Завъртете за 3D изглед</div>
                     </div>
                 </div>
             </div>
-
-            
         </section>
 
-        <!-- SECTION VI: Angle between skew lines -->
+        <!-- SECTION VI: Parallel Lines -->
         <section class="glass-card relative">
-            <h2 class="text-2xl font-bold mb-4 accent-gradient border-b border-gray-200 dark:border-slate-700 pb-2">VI. Ъгъл между кръстосани прави</h2>
+            <div class="flex flex-wrap justify-between items-center mb-4 gap-4 border-b border-gray-200 dark:border-slate-700 pb-2">
+                <h2 class="text-2xl font-bold accent-gradient m-0">VI. Успоредни прави: Свойства и Теореми</h2>
+            </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center mb-6">
-                <div class="order-2 lg:order-1 flex flex-col">
-                    <div id="skew-angle-canvas" class="canvas-container shadow-inner">
-                        <div class="canvas-overlay"><i data-lucide="rotate-3d" class="inline w-4 h-4 mr-1"></i> Завъртете за 3D изглед</div>
-                    </div>
-                </div>
-
-                <div class="order-1 lg:order-2">
-                    <p class="text-base text-gray-800 dark:text-gray-200 mb-4 font-medium">За да намерим ъгъла между две кръстосани прави $a$ и $b$, избираме произволна точка $M$ и през нея построяваме прави $a' \parallel a$ и $b' \parallel b$. Острият (или правият) ъгъл между $a'$ и $b'$ се нарича ъгъл между кръстосаните прави $a$ и $b$. Най-често за удобство точката $M$ се избира върху едната от правите.</p>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start mb-6">
+                <div>
+                    <p class="mb-4 text-lg text-gray-800 dark:text-gray-200 font-medium">Свойствата на успоредните прави в равнината се запазват и в пространството, но се добавят и нови важни теореми.</p>
 
                     <div class="space-y-4">
                         <label class="flex items-start p-4 rounded-lg cursor-pointer btn-3d">
-                            <input type="radio" name="skewAngleStep" value="step1" class="mt-1 mr-4 w-5 h-5 accent-blue-600" checked>
+                            <input type="radio" name="theoremType" value="th1" class="mt-1 mr-4 w-5 h-5 accent-blue-600" checked>
                             <div>
-                                <h4 class="font-bold text-gray-900 dark:text-white text-base">1. Кръстосани прави $a$ и $b$</h4>
+                                <h4 class="font-bold text-gray-900 dark:text-white text-lg">Основна теорема за успоредност</h4>
+                                <p class="text-base text-gray-800 dark:text-gray-300 mt-1">През точка, нележаща на дадена права, минава точно една права, успоредна на дадената.</p>
                             </div>
                         </label>
 
                         <label class="flex items-start p-4 rounded-lg cursor-pointer btn-3d">
-                            <input type="radio" name="skewAngleStep" value="step2" class="mt-1 mr-4 w-5 h-5 accent-blue-600">
+                            <input type="radio" name="theoremType" value="th2" class="mt-1 mr-4 w-5 h-5 accent-blue-600">
                             <div>
-                                <h4 class="font-bold text-gray-900 dark:text-white text-base">2. Избор на точка $M \in a$</h4>
+                                <h4 class="font-bold text-gray-900 dark:text-white text-lg">Теорема за транзитивност</h4>
+                                <p class="text-base text-gray-800 dark:text-gray-300 mt-1">Ако две прави в пространството са успоредни на трета, то те са успоредни помежду си. <br> <span class="font-mono text-sm bg-gray-100 dark:bg-slate-800 p-1 rounded mt-2 inline-block">a || c и b || c &Rightarrow; a || b</span></p>
                             </div>
                         </label>
-
+                        
                         <label class="flex items-start p-4 rounded-lg cursor-pointer btn-3d">
-                            <input type="radio" name="skewAngleStep" value="step3" class="mt-1 mr-4 w-5 h-5 accent-blue-600">
+                            <input type="radio" name="theoremType" value="th3" class="mt-1 mr-4 w-5 h-5 accent-blue-600">
                             <div>
-                                <h4 class="font-bold text-gray-900 dark:text-white text-base">3. Построяване на $b' \parallel b$ през $M$</h4>
-                            </div>
-                        </label>
-
-                        <label class="flex items-start p-4 rounded-lg cursor-pointer btn-3d">
-                            <input type="radio" name="skewAngleStep" value="step4" class="mt-1 mr-4 w-5 h-5 accent-blue-600">
-                            <div>
-                                <h4 class="font-bold text-gray-900 dark:text-white text-base">4. Ъгъл $\varphi = \angle(a, b')$</h4>
+                                <h4 class="font-bold text-gray-900 dark:text-white text-lg">Теорема за пресичане с равнина</h4>
+                                <p class="text-base text-gray-800 dark:text-gray-300 mt-1">Ако една равнина пресича едната от две успоредни прави, то тя пресича и другата.</p>
                             </div>
                         </label>
                     </div>
                 </div>
+
+                <div class="flex flex-col">
+                    <div id="theorems-canvas" class="canvas-container">
+                        <div class="canvas-overlay"><i data-lucide="rotate-3d" class="inline w-4 h-4 mr-1"></i> Завъртете за 3D изглед</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION VII: Practical Tasks -->
+        <section class="glass-card">
+            <h2 class="text-2xl font-bold mb-6 accent-gradient border-b border-gray-200 dark:border-slate-700 pb-2">VII. Практически задачи с динамични чертежи</h2>
+            
+            <div class="space-y-6">
+                
+                <!-- Task 1 -->
+                <div class="bg-white/50 dark:bg-slate-800/50 rounded-xl p-5 border border-gray-200 dark:border-slate-700">
+                    <h3 class="font-bold text-lg text-blue-700 dark:text-blue-400 mb-2">Задача 1</h3>
+                    <p class="text-base text-gray-900 dark:text-gray-100 mb-4 font-medium">Защо маса с три крака е стабилна?</p>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                        <div class="space-y-4">
+                            <div class="space-y-2">
+                                <label class="flex items-center p-3 rounded-lg cursor-pointer btn-3d">
+                                    <input type="radio" name="t1" value="t1_3" class="mr-3 w-5 h-5 accent-blue-600" checked>
+                                    <span class="font-semibold text-sm">3 крака (Стабилна маса)</span>
+                                </label>
+                                <label class="flex items-center p-3 rounded-lg cursor-pointer btn-3d">
+                                    <input type="radio" name="t1" value="t1_4" class="mr-3 w-5 h-5 accent-blue-600">
+                                    <span class="font-semibold text-sm">4 крака (Крив под / нестабилна)</span>
+                                </label>
+                            </div>
+                            <div class="bg-blue-50 dark:bg-blue-900/20 p-3 rounded border border-blue-200 dark:border-blue-800 text-sm text-gray-800 dark:text-gray-200">
+                                <i data-lucide="info" class="w-4 h-4 inline mr-1 text-blue-600 dark:text-blue-400"></i>
+                                <strong>Отговор:</strong> Според Аксиома 1, през произволни три точки винаги минава точно една равнина. Затова трите крака винаги лежат плътно на пода. Четвъртият крак може да се окаже извън тази равнина.
+                            </div>
+                        </div>
+                        <div class="canvas-container" style="height: 280px;" id="task1-canvas">
+                            <div class="canvas-overlay"><i data-lucide="rotate-3d" class="inline w-4 h-4 mr-1"></i> 3D Модел</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Task 2 -->
+                <div class="bg-white/50 dark:bg-slate-800/50 rounded-xl p-5 border border-gray-200 dark:border-slate-700">
+                    <h3 class="font-bold text-lg text-blue-700 dark:text-blue-400 mb-2">Задача 2</h3>
+                    <p class="text-base text-gray-900 dark:text-gray-100 mb-4 font-medium">Колко равнини определят три прави, минаващи през една точка?</p>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                        <div class="space-y-4">
+                            <div class="space-y-2">
+                                <label class="flex items-center p-3 rounded-lg cursor-pointer btn-3d">
+                                    <input type="radio" name="t2" value="t2_1" class="mr-3 w-5 h-5 accent-blue-600" checked>
+                                    <span class="font-semibold text-sm">В една равнина (Компланарни)</span>
+                                </label>
+                                <label class="flex items-center p-3 rounded-lg cursor-pointer btn-3d">
+                                    <input type="radio" name="t2" value="t2_3" class="mr-3 w-5 h-5 accent-blue-600">
+                                    <span class="font-semibold text-sm">Не лежат в една равнина</span>
+                                </label>
+                            </div>
+                            <div class="bg-blue-50 dark:bg-blue-900/20 p-3 rounded border border-blue-200 dark:border-blue-800 text-sm text-gray-800 dark:text-gray-200">
+                                <i data-lucide="info" class="w-4 h-4 inline mr-1 text-blue-600 dark:text-blue-400"></i>
+                                <strong>Отговор:</strong> 
+                                Ако правите са компланарни (лежат в една равнина), те определят <strong>1 равнина</strong>. 
+                                Ако не са, всеки две прави определят по една равнина, тоест общо <strong>3 равнини</strong>.
+                            </div>
+                        </div>
+                        <div class="canvas-container" style="height: 280px;" id="task2-canvas">
+                            <div class="canvas-overlay"><i data-lucide="rotate-3d" class="inline w-4 h-4 mr-1"></i> 3D Модел</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Task 3 -->
+                <div class="bg-white/50 dark:bg-slate-800/50 rounded-xl p-5 border border-gray-200 dark:border-slate-700">
+                    <h3 class="font-bold text-lg text-blue-700 dark:text-blue-400 mb-2">Задача 3</h3>
+                    <p class="text-base text-gray-900 dark:text-gray-100 mb-4 font-medium">Четири точки не лежат в една равнина. Може ли три от тях да лежат на една права?</p>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                        <div class="space-y-4">
+                            <div class="space-y-2">
+                                <label class="flex items-center p-3 rounded-lg cursor-pointer btn-3d">
+                                    <input type="radio" name="t3" value="t3_no" class="mr-3 w-5 h-5 accent-blue-600" checked>
+                                    <span class="font-semibold text-sm">Нито 3 не са на една права (Тетраедър)</span>
+                                </label>
+                                <label class="flex items-center p-3 rounded-lg cursor-pointer btn-3d">
+                                    <input type="radio" name="t3" value="t3_yes" class="mr-3 w-5 h-5 accent-blue-600">
+                                    <span class="font-semibold text-sm">Ако 3 лежат на една права...</span>
+                                </label>
+                            </div>
+                            <div class="bg-blue-50 dark:bg-blue-900/20 p-3 rounded border border-blue-200 dark:border-blue-800 text-sm text-gray-800 dark:text-gray-200">
+                                <i data-lucide="info" class="w-4 h-4 inline mr-1 text-blue-600 dark:text-blue-400"></i>
+                                <strong>Отговор:</strong> <strong>НЕ.</strong> Ако 3 точки лежат на една права, то тази права и 4-тата точка определят точно една равнина. Следователно всички 4 точки ще лежат в една равнина, което противоречи на условието!
+                            </div>
+                        </div>
+                        <div class="canvas-container" style="height: 280px;" id="task3-canvas">
+                            <div class="canvas-overlay"><i data-lucide="rotate-3d" class="inline w-4 h-4 mr-1"></i> 3D Модел</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Task 4 -->
+                <div class="bg-white/50 dark:bg-slate-800/50 rounded-xl p-5 border border-gray-200 dark:border-slate-700">
+                    <h3 class="font-bold text-lg text-blue-700 dark:text-blue-400 mb-2">Задача 4</h3>
+                    <p class="text-base text-gray-900 dark:text-gray-100 mb-4 font-medium">Покажете двойки ръбове на стаята, които са успоредни, пресичащи се и кръстосани прави.</p>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                        <div class="space-y-4">
+                            <div class="space-y-2">
+                                <label class="flex items-center p-3 rounded-lg cursor-pointer btn-3d">
+                                    <input type="radio" name="t4" value="t4_par" class="mr-3 w-5 h-5 accent-blue-600" checked>
+                                    <span class="font-semibold text-sm">Успоредни ръбове</span>
+                                </label>
+                                <label class="flex items-center p-3 rounded-lg cursor-pointer btn-3d">
+                                    <input type="radio" name="t4" value="t4_int" class="mr-3 w-5 h-5 accent-blue-600">
+                                    <span class="font-semibold text-sm">Пресичащи се ръбове</span>
+                                </label>
+                                <label class="flex items-center p-3 rounded-lg cursor-pointer btn-3d">
+                                    <input type="radio" name="t4" value="t4_skew" class="mr-3 w-5 h-5 accent-blue-600">
+                                    <span class="font-semibold text-sm">Кръстосани ръбове</span>
+                                </label>
+                            </div>
+                            <div class="bg-blue-50 dark:bg-blue-900/20 p-3 rounded border border-blue-200 dark:border-blue-800 text-sm text-gray-800 dark:text-gray-200">
+                                <i data-lucide="info" class="w-4 h-4 inline mr-1 text-blue-600 dark:text-blue-400"></i>
+                                <strong>Модел:</strong> Представете си стая. <strong>Успоредни:</strong> ръбът между пода и стената и ръбът между тавана и същата стена. <strong>Пресичащи:</strong> два ръба в ъгъла. <strong>Кръстосани:</strong> ръб на пода отляво и ръб на тавана отдясно.
+                            </div>
+                        </div>
+                        <div class="canvas-container" style="height: 280px;" id="task4-canvas">
+                            <div class="canvas-overlay"><i data-lucide="rotate-3d" class="inline w-4 h-4 mr-1"></i> 3D Модел</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Task 5 -->
+                <div class="bg-white/50 dark:bg-slate-800/50 rounded-xl p-5 border border-gray-200 dark:border-slate-700">
+                    <h3 class="font-bold text-lg text-blue-700 dark:text-blue-400 mb-2">Задача 5</h3>
+                    <p class="text-base text-gray-900 dark:text-gray-100 mb-4 font-medium">Даден е куб $ABCDA_1B_1C_1D_1$. Запишете ръбовете на куба, които се отнасят към ръба $A_1D_1$ по следния начин:</p>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                        <div class="space-y-4">
+                            <div class="space-y-2">
+                                <label class="flex items-center p-3 rounded-lg cursor-pointer btn-3d">
+                                    <input type="radio" name="t5" value="t5_a" class="mr-3 w-5 h-5 accent-blue-600" checked>
+                                    <span class="font-semibold text-sm">а) Пресичат $A_1D_1$</span>
+                                </label>
+                                <label class="flex items-center p-3 rounded-lg cursor-pointer btn-3d">
+                                    <input type="radio" name="t5" value="t5_b" class="mr-3 w-5 h-5 accent-blue-600">
+                                    <span class="font-semibold text-sm">б) Успоредни на $A_1D_1$</span>
+                                </label>
+                                <label class="flex items-center p-3 rounded-lg cursor-pointer btn-3d">
+                                    <input type="radio" name="t5" value="t5_c" class="mr-3 w-5 h-5 accent-blue-600">
+                                    <span class="font-semibold text-sm">в) Кръстосани с $A_1D_1$</span>
+                                </label>
+                            </div>
+                            <div class="bg-blue-50 dark:bg-blue-900/20 p-3 rounded border border-blue-200 dark:border-blue-800 text-sm text-gray-800 dark:text-gray-200" id="t5-ans">
+                                <i data-lucide="info" class="w-4 h-4 inline mr-1 text-blue-600 dark:text-blue-400"></i>
+                                <strong>Отговори:</strong> <br>
+                                а) $A_1B_1, A_1A, D_1C_1, D_1D$<br>
+                                б) $AD, BC, B_1C_1$<br>
+                                в) $AB, CD, BB_1, CC_1$
+                            </div>
+                        </div>
+                        <div class="canvas-container" style="height: 280px;" id="task5-canvas">
+                            <div class="canvas-overlay"><i data-lucide="rotate-3d" class="inline w-4 h-4 mr-1"></i> 3D Модел</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Task 6 -->
+                <div class="bg-white/50 dark:bg-slate-800/50 rounded-xl p-5 border border-gray-200 dark:border-slate-700">
+                    <h3 class="font-bold text-lg text-blue-700 dark:text-blue-400 mb-2">Задача 6</h3>
+                    <p class="text-base text-gray-900 dark:text-gray-100 mb-4 font-medium">Дадена е триъгълна пирамида $ABCD$. Запишете двойките ръбове на пирамидата, които са кръстосани.</p>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                        <div class="space-y-4">
+                            <div class="space-y-2">
+                                <label class="flex items-center p-3 rounded-lg cursor-pointer btn-3d">
+                                    <input type="radio" name="t6" value="t6_1" class="mr-3 w-5 h-5 accent-blue-600" checked>
+                                    <span class="font-semibold text-sm">Двойка 1: $AB$ и $CD$</span>
+                                </label>
+                                <label class="flex items-center p-3 rounded-lg cursor-pointer btn-3d">
+                                    <input type="radio" name="t6" value="t6_2" class="mr-3 w-5 h-5 accent-blue-600">
+                                    <span class="font-semibold text-sm">Двойка 2: $AC$ и $BD$</span>
+                                </label>
+                                <label class="flex items-center p-3 rounded-lg cursor-pointer btn-3d">
+                                    <input type="radio" name="t6" value="t6_3" class="mr-3 w-5 h-5 accent-blue-600">
+                                    <span class="font-semibold text-sm">Двойка 3: $AD$ и $BC$</span>
+                                </label>
+                            </div>
+                            <div class="bg-blue-50 dark:bg-blue-900/20 p-3 rounded border border-blue-200 dark:border-blue-800 text-sm text-gray-800 dark:text-gray-200">
+                                <i data-lucide="info" class="w-4 h-4 inline mr-1 text-blue-600 dark:text-blue-400"></i>
+                                <strong>Отговор:</strong> В тетраедър (триъгълна пирамида) кръстосани са тези ръбове, които нямат общ връх. Такива са точно трите посочени двойки.
+                            </div>
+                        </div>
+                        <div class="canvas-container" style="height: 280px;" id="task6-canvas">
+                            <div class="canvas-overlay"><i data-lucide="rotate-3d" class="inline w-4 h-4 mr-1"></i> 3D Модел</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Task 7 -->
+                <div class="bg-white/50 dark:bg-slate-800/50 rounded-xl p-5 border border-gray-200 dark:border-slate-700">
+                    <h3 class="font-bold text-lg text-blue-700 dark:text-blue-400 mb-2">Задача 7</h3>
+                    <p class="text-base text-gray-900 dark:text-gray-100 mb-4 font-medium">Даден е куб $ABCDA_1B_1C_1D_1$. Намерете посочените ъгли:</p>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                        <div class="space-y-4">
+                            <div class="space-y-2">
+                                <label class="flex items-center p-3 rounded-lg cursor-pointer btn-3d">
+                                    <input type="radio" name="t7" value="t7_a" class="mr-3 w-5 h-5 accent-blue-600" checked>
+                                    <span class="font-semibold text-sm">а) Мярката на $\angle(AB_1, CC_1)$</span>
+                                </label>
+                                <label class="flex items-center p-3 rounded-lg cursor-pointer btn-3d">
+                                    <input type="radio" name="t7" value="t7_b" class="mr-3 w-5 h-5 accent-blue-600">
+                                    <span class="font-semibold text-sm">б) Мярката на $\angle(AC, B_1D_1)$</span>
+                                </label>
+                            </div>
+                            <div class="bg-blue-50 dark:bg-blue-900/20 p-3 rounded border border-blue-200 dark:border-blue-800 text-sm text-gray-800 dark:text-gray-200">
+                                <i data-lucide="info" class="w-4 h-4 inline mr-1 text-blue-600 dark:text-blue-400"></i>
+                                <strong>Решение:</strong> За да намерим ъгъл между кръстосани прави, транслираме успоредно едната, докато се пресече с другата.<br>
+                                а) Тъй като $CC_1 || BB_1$, ъгълът е $\angle(AB_1, BB_1) = 45^\circ$ (ъгъл в квадрат).<br>
+                                б) Тъй като $B_1D_1 || BD$, ъгълът е $\angle(AC, BD) = 90^\circ$ (диагонали в квадрат).
+                            </div>
+                        </div>
+                        <div class="canvas-container" style="height: 280px;" id="task7-canvas">
+                            <div class="canvas-overlay"><i data-lucide="rotate-3d" class="inline w-4 h-4 mr-1"></i> 3D Модел</div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </section>
 
     </main>
 
-    <footer class="bg-white/90 dark:bg-slate-900/90 border-t border-gray-200 dark:border-slate-800 py-6 text-center text-sm text-gray-600 dark:text-gray-400 backdrop-blur-md transition-colors relative z-10">
-        <p>&copy; 2026 Интерактивен урок по Стереометрия.</p>
+    <footer class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-t border-gray-200 dark:border-slate-800 py-6 mt-12 transition-colors">
+        <div class="max-w-6xl mx-auto px-4 text-center text-gray-600 dark:text-gray-400">
+            <p>&copy; 2024 Интерактивен урок по Стереометрия.</p>
+        </div>
     </footer>
 
+    <!-- Core Logic Script -->
     <script>
-        lucide.createIcons();
-
-        window.addEventListener('load', async () => {
-            initThreeJS();
-            if (window.MathJax) {
-                try {
-                    await MathJax.typesetPromise();
-                } catch (e) {
-                    console.warn('MathJax typeset error:', e);
-                }
-            }
-        });
-
-        // Theme Toggle Logic
+        // --- 1. Theme Management ---
         const themeToggleBtn = document.getElementById('theme-toggle');
         const htmlElement = document.documentElement;
 
-        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            htmlElement.classList.add('dark');
-        } else {
-            htmlElement.classList.remove('dark');
+        function toggleTheme() {
+            if (htmlElement.classList.contains('dark')) {
+                htmlElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                htmlElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
         }
 
-        themeToggleBtn.addEventListener('click', () => {
-            htmlElement.classList.toggle('dark');
-            if (htmlElement.classList.contains('dark')) {
-                localStorage.setItem('theme', 'dark');
-            } else {
-                localStorage.setItem('theme', 'light');
+        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            htmlElement.classList.add('dark');
+        }
+
+        themeToggleBtn.addEventListener('click', toggleTheme);
+
+        // --- 2. Quiz Logic ---
+        function initQuizzes() {
+            document.querySelectorAll('.quiz-group').forEach(group => {
+                const feedback = group.nextElementSibling;
+                const buttons = group.querySelectorAll('.quiz-btn');
+                
+                buttons.forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        // Reset all buttons in this group
+                        buttons.forEach(b => {
+                            b.classList.remove('correct', 'wrong');
+                            b.disabled = true; // Disable after one click to prevent guessing spam
+                        });
+                        
+                        const isCorrect = this.getAttribute('data-correct') === 'true';
+                        
+                        if (isCorrect) {
+                            this.classList.add('correct');
+                            feedback.innerHTML = '<span class="text-green-600 dark:text-green-400"><i data-lucide="check-circle" class="inline w-4 h-4 mr-1"></i> Правилно!</span>';
+                        } else {
+                            this.classList.add('wrong');
+                            // Highlight the correct one
+                            group.querySelector('[data-correct="true"]').classList.add('correct');
+                            feedback.innerHTML = '<span class="text-red-600 dark:text-red-400"><i data-lucide="x-circle" class="inline w-4 h-4 mr-1"></i> Грешно. Вижте верния отговор.</span>';
+                        }
+                        
+                        feedback.classList.remove('hidden');
+                        if (window.lucide) lucide.createIcons();
+                    });
+                });
+            });
+        }
+
+        // --- 3. Three.js Setup & Helpers ---
+        const scenes = [];
+
+        function createBaseScene(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) {
+                console.error("Липсва контейнер с ID: " + containerId);
+                return null;
+            }
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
+            camera.position.set(4, 4, 6);
+
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
+
+            const controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            dirLight.position.set(5, 10, 7);
+            scene.add(dirLight);
+
+            const mainGroup = new THREE.Group();
+            scene.add(mainGroup);
+
+            const sceneData = { scene, camera, renderer, controls, container, mainGroup };
+            scenes.push(sceneData);
+            return sceneData;
+        }
+
+        // Geometry Helpers
+        const matPoint = new THREE.MeshPhongMaterial({ color: 0xef4444, shininess: 100 }); // Red
+        const matLine = new THREE.MeshPhongMaterial({ color: 0x3b82f6, shininess: 80 });  // Blue
+        const matLineAlt = new THREE.MeshPhongMaterial({ color: 0x10b981, shininess: 80 }); // Green
+        const matPlane = new THREE.MeshPhysicalMaterial({ 
+            color: 0xa855f7, // Purple
+            transparent: true, 
+            opacity: 0.4, 
+            side: THREE.DoubleSide,
+            roughness: 0.1,
+            metalness: 0.1,
+            clearcoat: 1.0
+        });
+
+        // Global materials for highlights and tasks
+        const matBaseLine = new THREE.MeshPhongMaterial({ color: 0x94a3b8 });
+        const matHigh1 = new THREE.MeshPhongMaterial({ color: 0xef4444 }); // red
+        const matHigh2 = new THREE.MeshPhongMaterial({ color: 0x10b981 }); // green
+        const matHigh3 = new THREE.MeshPhongMaterial({ color: 0xeab308 }); // yellow
+        const matTransPlane = new THREE.MeshPhysicalMaterial({ color: 0xa855f7, transparent: true, opacity: 0.3, side: THREE.DoubleSide });
+
+        function createPoint(x, y, z) {
+            const geo = new THREE.SphereGeometry(0.12, 32, 32);
+            const mesh = new THREE.Mesh(geo, matPoint);
+            mesh.position.set(x, y, z);
+            return mesh;
+        }
+
+        function createLine(p1, p2, material = matLine, thickness = 0.04) {
+            const distance = p1.distanceTo(p2);
+            const geo = new THREE.CylinderGeometry(thickness, thickness, distance, 16);
+            const mesh = new THREE.Mesh(geo, material);
+            const mid = p1.clone().lerp(p2, 0.5);
+            mesh.position.copy(mid);
+            mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), p2.clone().sub(p1).normalize());
+            return mesh;
+        }
+
+        function createPlane(w, h, colorHex = null) {
+            const geo = new THREE.PlaneGeometry(w, h);
+            const mat = colorHex ? matPlane.clone() : matPlane;
+            if(colorHex) mat.color.setHex(colorHex);
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.rotation.x = -Math.PI / 2; // Flat on XZ by default
+            return mesh;
+        }
+
+        function makeTextSprite(text, scale = 1) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 128; canvas.height = 128;
+            const ctx = canvas.getContext('2d');
+            ctx.font = "italic bold 64px 'Times New Roman', serif"; // Математически изглед
+            ctx.fillStyle = document.documentElement.classList.contains('dark') ? '#ffffff' : '#111827';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(text, 64, 64);
+            const texture = new THREE.CanvasTexture(canvas);
+            const mat = new THREE.SpriteMaterial({ map: texture, depthTest: false });
+            const sprite = new THREE.Sprite(mat);
+            sprite.scale.set(scale, scale, 1);
+            return sprite;
+        }
+
+        function addLabel(grp, text, pos, offset = new THREE.Vector3(0, 0.4, 0), scale = 0.9) {
+            let sp = makeTextSprite(text, scale);
+            sp.position.copy(pos).add(offset);
+            grp.add(sp);
+        }
+
+        // Функция за създаване на маркер за ъгъл (секторче + дъга)
+        function createSector(center, p1, p2, radius, colorHex = 0xeab308) {
+            let v1 = p1.clone().sub(center).normalize();
+            let v2 = p2.clone().sub(center).normalize();
+            
+            // Гарантираме, че ъгълът е остър (определение за ъгъл между прави)
+            if (v1.dot(v2) < 0) {
+                v2.negate();
+            }
+            
+            let normal = new THREE.Vector3().crossVectors(v1, v2).normalize();
+            if (normal.lengthSq() < 0.001) normal.set(0, 1, 0); // fallback ако са колинеарни
+            
+            const angle = v1.angleTo(v2);
+            
+            // Полупрозрачен сектор
+            const geo = new THREE.CircleGeometry(radius, 32, 0, angle);
+            const mat = new THREE.MeshBasicMaterial({ color: colorHex, side: THREE.DoubleSide, transparent: true, opacity: 0.5 });
+            const mesh = new THREE.Mesh(geo, mat);
+            
+            // Завъртане на сектора спрямо векторите
+            const matrix = new THREE.Matrix4();
+            const yAxis = new THREE.Vector3().crossVectors(normal, v1).normalize();
+            matrix.makeBasis(v1, yAxis, normal);
+            
+            mesh.applyMatrix4(matrix);
+            mesh.position.copy(center);
+            
+            const group = new THREE.Group();
+            group.add(mesh);
+            
+            // Плътна външна дъга за по-добра видимост
+            const curve = new THREE.EllipseCurve(0, 0, radius, radius, 0, angle, false, 0);
+            const points = curve.getPoints(32);
+            const lineGeo = new THREE.BufferGeometry().setFromPoints(points);
+            const lineMat = new THREE.LineBasicMaterial({ color: colorHex, linewidth: 3 });
+            const arc = new THREE.Line(lineGeo, lineMat);
+            arc.applyMatrix4(matrix);
+            arc.position.copy(center);
+            group.add(arc);
+            
+            return group;
+        }
+
+        // --- Scene 1: Basic Objects ---
+        function initBasicObjects() {
+            const ctx = createBaseScene('basic-objects-canvas');
+            if (!ctx) return;
+            const { mainGroup } = ctx;
+            
+            // Plane
+            const plane = createPlane(5, 5);
+            plane.position.y = -1;
+            mainGroup.add(plane);
+            addLabel(mainGroup, 'α', new THREE.Vector3(-2, -1, -2), new THREE.Vector3(0, 0.2, 0), 1.2);
+            
+            // Line
+            const p1 = new THREE.Vector3(-2, 0, 0), p2 = new THREE.Vector3(2, 2, 0);
+            mainGroup.add(createLine(p1, p2));
+            addLabel(mainGroup, 'a', p2, new THREE.Vector3(0.2, 0.2, 0));
+
+            // Points
+            const ptA = new THREE.Vector3(1, -1, 1);
+            mainGroup.add(createPoint(ptA.x, ptA.y, ptA.z));
+            addLabel(mainGroup, 'A', ptA);
+
+            const ptB = new THREE.Vector3(0, 1, 0);
+            mainGroup.add(createPoint(ptB.x, ptB.y, ptB.z));
+            addLabel(mainGroup, 'B', ptB);
+
+            const ptC = new THREE.Vector3(-1, 2, 1);
+            mainGroup.add(createPoint(ptC.x, ptC.y, ptC.z));
+            addLabel(mainGroup, 'C', ptC);
+        }
+
+        // --- Scene 2: Notations ---
+        let notationCtx = null;
+        function initNotations() {
+            notationCtx = createBaseScene('notation-canvas');
+            if (!notationCtx) return;
+            updateNotation('pt_in_line');
+            
+            document.querySelectorAll('input[name="notType"]').forEach(radio => {
+                radio.addEventListener('change', (e) => updateNotation(e.target.value));
+            });
+        }
+        
+        function updateNotation(type) {
+            if (!notationCtx) return;
+            const grp = notationCtx.mainGroup;
+            grp.clear();
+            
+            const p1 = new THREE.Vector3(-2, 0, 0);
+            const p2 = new THREE.Vector3(2, 0, 0);
+            const planeOrigin = new THREE.Vector3(-1.5, 0, -1.5);
+
+            if (type === 'pt_in_line') {
+                grp.add(createLine(p1, p2));
+                addLabel(grp, 'a', p2, new THREE.Vector3(0.2, 0.2, 0));
+                const pt = new THREE.Vector3(0, 0, 0);
+                grp.add(createPoint(pt.x, pt.y, pt.z));
+                addLabel(grp, 'A', pt);
+            } else if (type === 'pt_notin_line') {
+                grp.add(createLine(p1, p2));
+                addLabel(grp, 'a', p2, new THREE.Vector3(0.2, 0.2, 0));
+                const pt = new THREE.Vector3(0, 1.5, 0);
+                grp.add(createPoint(pt.x, pt.y, pt.z));
+                addLabel(grp, 'A', pt);
+            } else if (type === 'pt_in_plane') {
+                grp.add(createPlane(4, 4));
+                addLabel(grp, 'α', planeOrigin, new THREE.Vector3(0, 0.2, 0), 1.2);
+                const pt = new THREE.Vector3(1, 0, 1);
+                grp.add(createPoint(pt.x, pt.y, pt.z));
+                addLabel(grp, 'A', pt);
+            } else if (type === 'pt_notin_plane') {
+                grp.add(createPlane(4, 4));
+                addLabel(grp, 'α', planeOrigin, new THREE.Vector3(0, 0.2, 0), 1.2);
+                const pt = new THREE.Vector3(0, 2, 0);
+                grp.add(createPoint(pt.x, pt.y, pt.z));
+                addLabel(grp, 'A', pt);
+            } else if (type === 'line_in_plane') {
+                grp.add(createPlane(4, 4));
+                addLabel(grp, 'α', planeOrigin, new THREE.Vector3(0, 0.2, 0), 1.2);
+                const l1 = new THREE.Vector3(-1.5, 0, -1), l2 = new THREE.Vector3(1.5, 0, 1);
+                grp.add(createLine(l1, l2));
+                addLabel(grp, 'a', l2, new THREE.Vector3(0.2, 0.2, 0));
+            } else if (type === 'line_notin_plane') {
+                grp.add(createPlane(4, 4));
+                addLabel(grp, 'α', planeOrigin, new THREE.Vector3(0, 0.2, 0), 1.2);
+                const l1 = new THREE.Vector3(-2, 1.5, 0), l2 = new THREE.Vector3(2, 1.5, 0);
+                grp.add(createLine(l1, l2));
+                addLabel(grp, 'a', l2, new THREE.Vector3(0.2, 0.2, 0));
+            } else if (type === 'line_intersect_plane') {
+                grp.add(createPlane(4, 4));
+                addLabel(grp, 'α', planeOrigin, new THREE.Vector3(0, 0.2, 0), 1.2);
+                const l1 = new THREE.Vector3(-1, -2, -1), l2 = new THREE.Vector3(1, 2, 1);
+                grp.add(createLine(l1, l2));
+                addLabel(grp, 'a', l2, new THREE.Vector3(0.2, 0.2, 0));
+                const ptM = new THREE.Vector3(0, 0, 0);
+                grp.add(createPoint(ptM.x, ptM.y, ptM.z));
+                addLabel(grp, 'M', ptM);
+            }
+        }
+
+        // --- Scene 3: Axioms (с поетапна динамика) ---
+        let axiomsCtx = null;
+        function initAxioms() {
+            axiomsCtx = createBaseScene('axioms-canvas');
+            if (!axiomsCtx) return;
+            updateAxioms('ax1');
+            
+            document.querySelectorAll('input[name="axiomType"]').forEach(radio => {
+                radio.addEventListener('change', (e) => updateAxioms(e.target.value));
+            });
+        }
+
+        function updateAxioms(type) {
+            if (!axiomsCtx) return;
+            const grp = axiomsCtx.mainGroup;
+            grp.clear();
+            if (axiomsCtx.timeoutId) clearTimeout(axiomsCtx.timeoutId);
+
+            if (type === 'ax1') {
+                // Поетапно: първо се появяват точките
+                const ptA = new THREE.Vector3(-1, 0, 1), ptB = new THREE.Vector3(1, 0, 1), ptC = new THREE.Vector3(0, 0, -1);
+                grp.add(createPoint(ptA.x, ptA.y, ptA.z)); addLabel(grp, 'A', ptA);
+                grp.add(createPoint(ptB.x, ptB.y, ptB.z)); addLabel(grp, 'B', ptB);
+                grp.add(createPoint(ptC.x, ptC.y, ptC.z)); addLabel(grp, 'C', ptC);
+                
+                // След това (със забавяне) се появява равнината
+                axiomsCtx.timeoutId = setTimeout(() => {
+                    if (document.querySelector('input[name="axiomType"]:checked').value === 'ax1') {
+                        grp.add(createPlane(4, 4));
+                        addLabel(grp, 'α', new THREE.Vector3(-1.5, 0, -1.5), new THREE.Vector3(0, 0.2, 0), 1.2);
+                    }
+                }, 1000);
+            } else if (type === 'ax2') {
+                grp.add(createPlane(4, 4));
+                addLabel(grp, 'α', new THREE.Vector3(-1.5, 0, -1.5), new THREE.Vector3(0, 0.2, 0), 1.2);
+                const ptA = new THREE.Vector3(-1.5, 0, -1), ptB = new THREE.Vector3(1.5, 0, 1);
+                grp.add(createPoint(ptA.x, ptA.y, ptA.z)); addLabel(grp, 'A', ptA);
+                grp.add(createPoint(ptB.x, ptB.y, ptB.z)); addLabel(grp, 'B', ptB);
+                const l1 = new THREE.Vector3(-2.25, 0, -1.5), l2 = new THREE.Vector3(2.25, 0, 1.5);
+                grp.add(createLine(l1, l2));
+                addLabel(grp, 'a', l2, new THREE.Vector3(0.2, 0.2, 0));
+            } else if (type === 'ax3') {
+                const p1 = createPlane(4, 4);
+                const p2 = createPlane(4, 4, 0x3b82f6); 
+                p2.rotation.x = 0; 
+                grp.add(p1); addLabel(grp, 'α', new THREE.Vector3(-1.5, 0, -1.5), new THREE.Vector3(0, 0.2, 0), 1.2);
+                grp.add(p2); addLabel(grp, 'β', new THREE.Vector3(-1.5, 1.5, 0), new THREE.Vector3(0, 0, 0.2), 1.2);
+                const l1 = new THREE.Vector3(-2, 0, 0), l2 = new THREE.Vector3(2, 0, 0);
+                grp.add(createLine(l1, l2, matLineAlt, 0.06));
+                addLabel(grp, 'c', l2, new THREE.Vector3(0.2, 0.2, 0));
+            } else if (type === 'ax4') {
+                grp.add(createPlane(5, 5));
+                addLabel(grp, 'α', new THREE.Vector3(-2, 0, -2), new THREE.Vector3(0, 0.2, 0), 1.2);
+                const v1 = new THREE.Vector3(-1, 0.01, 1), v2 = new THREE.Vector3(1, 0.01, 1), v3 = new THREE.Vector3(0, 0.01, -1);
+                grp.add(createLine(v1, v2)); grp.add(createLine(v2, v3)); grp.add(createLine(v3, v1));
+                grp.add(createPoint(v1.x, v1.y, v1.z)); addLabel(grp, 'A', v1);
+                grp.add(createPoint(v2.x, v2.y, v2.z)); addLabel(grp, 'B', v2);
+                grp.add(createPoint(v3.x, v3.y, v3.z)); addLabel(grp, 'C', v3);
+            }
+        }
+
+        // --- Scene 4: Plane Definitions (с поетапна динамика) ---
+        let planeDefCtx = null;
+        function initPlaneDefs() {
+            planeDefCtx = createBaseScene('plane-def-canvas');
+            if (!planeDefCtx) return;
+            updatePlaneDefs('pd1');
+            
+            document.querySelectorAll('input[name="planeDefType"]').forEach(radio => {
+                radio.addEventListener('change', (e) => updatePlaneDefs(e.target.value));
+            });
+        }
+
+        function updatePlaneDefs(type) {
+            if (!planeDefCtx) return;
+            const grp = planeDefCtx.mainGroup;
+            grp.clear();
+            if (planeDefCtx.timeoutId) clearTimeout(planeDefCtx.timeoutId);
+
+            // Първо се рисуват обектите, определящи равнината
+            if (type === 'pd1') {
+                const ptA = new THREE.Vector3(-1, 0, 1), ptB = new THREE.Vector3(1, 0, 1), ptC = new THREE.Vector3(0, 0, -1);
+                grp.add(createPoint(ptA.x, ptA.y, ptA.z)); addLabel(grp, 'A', ptA);
+                grp.add(createPoint(ptB.x, ptB.y, ptB.z)); addLabel(grp, 'B', ptB);
+                grp.add(createPoint(ptC.x, ptC.y, ptC.z)); addLabel(grp, 'C', ptC);
+            } else if (type === 'pd2') {
+                const l1 = new THREE.Vector3(-1.5, 0, 1), l2 = new THREE.Vector3(1.5, 0, 1);
+                grp.add(createLine(l1, l2)); addLabel(grp, 'a', l2, new THREE.Vector3(0.2, 0.2, 0));
+                const pt = new THREE.Vector3(0, 0, -1);
+                grp.add(createPoint(pt.x, pt.y, pt.z)); addLabel(grp, 'A', pt);
+            } else if (type === 'pd3') {
+                const a1 = new THREE.Vector3(-1.5, 0, -1.5), a2 = new THREE.Vector3(1.5, 0, 1.5);
+                const b1 = new THREE.Vector3(-1.5, 0, 1.5), b2 = new THREE.Vector3(1.5, 0, -1.5);
+                grp.add(createLine(a1, a2)); addLabel(grp, 'a', a2, new THREE.Vector3(0.2, 0.2, 0));
+                grp.add(createLine(b1, b2)); addLabel(grp, 'b', b2, new THREE.Vector3(0.2, 0.2, 0));
+                const ptM = new THREE.Vector3(0, 0, 0);
+                grp.add(createPoint(ptM.x, ptM.y, ptM.z)); addLabel(grp, 'M', ptM);
+            } else if (type === 'pd4') {
+                const a1 = new THREE.Vector3(-1.5, 0, 1), a2 = new THREE.Vector3(1.5, 0, 1);
+                const b1 = new THREE.Vector3(-1.5, 0, -1), b2 = new THREE.Vector3(1.5, 0, -1);
+                grp.add(createLine(a1, a2)); addLabel(grp, 'a', a2, new THREE.Vector3(0.2, 0.2, 0));
+                grp.add(createLine(b1, b2)); addLabel(grp, 'b', b2, new THREE.Vector3(0.2, 0.2, 0));
+            }
+
+            // След това (със забавяне) се появява самата равнина
+            planeDefCtx.timeoutId = setTimeout(() => {
+                if (document.querySelector('input[name="planeDefType"]:checked').value === type) {
+                    grp.add(createPlane(4, 4)); 
+                    addLabel(grp, 'α', new THREE.Vector3(-1.5, 0, -1.5), new THREE.Vector3(0, 0.2, 0), 1.2);
+                }
+            }, 1000);
+        }
+
+        // --- Scene 5: Mutual Positions ---
+        let posCtx = null;
+        function initPositions() {
+            posCtx = createBaseScene('position-canvas');
+            if (!posCtx) return;
+            updatePositions('intersecting');
+            
+            document.querySelectorAll('input[name="linePosition"]').forEach(radio => {
+                radio.addEventListener('change', (e) => updatePositions(e.target.value));
+            });
+        }
+
+        function updatePositions(type) {
+            if (!posCtx) return;
+            const grp = posCtx.mainGroup;
+            grp.clear();
+
+            if (type === 'intersecting') {
+                grp.add(createPlane(4, 4)); addLabel(grp, 'α', new THREE.Vector3(-1.5, 0, -1.5), new THREE.Vector3(0, 0.2, 0), 1.2);
+                const a1 = new THREE.Vector3(-1.5, 0, -1.5), a2 = new THREE.Vector3(1.5, 0, 1.5);
+                const b1 = new THREE.Vector3(-1.5, 0, 1.5), b2 = new THREE.Vector3(1.5, 0, -1.5);
+                grp.add(createLine(a1, a2)); addLabel(grp, 'a', a2, new THREE.Vector3(0.2, 0.2, 0));
+                grp.add(createLine(b1, b2, matLineAlt)); addLabel(grp, 'b', b2, new THREE.Vector3(0.2, 0.2, 0));
+                const ptM = new THREE.Vector3(0, 0, 0);
+                grp.add(createPoint(ptM.x, ptM.y, ptM.z)); addLabel(grp, 'M', ptM);
+            } else if (type === 'parallel') {
+                grp.add(createPlane(4, 4)); addLabel(grp, 'α', new THREE.Vector3(-1.5, 0, -1.5), new THREE.Vector3(0, 0.2, 0), 1.2);
+                const a1 = new THREE.Vector3(-1.5, 0, 1), a2 = new THREE.Vector3(1.5, 0, 1);
+                const b1 = new THREE.Vector3(-1.5, 0, -1), b2 = new THREE.Vector3(1.5, 0, -1);
+                grp.add(createLine(a1, a2)); addLabel(grp, 'a', a2, new THREE.Vector3(0.2, 0.2, 0));
+                grp.add(createLine(b1, b2, matLineAlt)); addLabel(grp, 'b', b2, new THREE.Vector3(0.2, 0.2, 0));
+            } else if (type === 'skew') {
+                const a1 = new THREE.Vector3(-2, 1, 0), a2 = new THREE.Vector3(2, 1, 0);
+                grp.add(createLine(a1, a2)); addLabel(grp, 'a', a2, new THREE.Vector3(0.2, 0.2, 0));
+                
+                const b1 = new THREE.Vector3(0, -1, -2), b2 = new THREE.Vector3(0, -1, 2);
+                grp.add(createLine(b1, b2, matLineAlt)); addLabel(grp, 'b', b2, new THREE.Vector3(0.2, 0.2, 0));
+            } else if (type === 'skew_criterion') {
+                grp.add(createPlane(4, 4)); addLabel(grp, 'α', new THREE.Vector3(-1.5, 0, -1.5), new THREE.Vector3(0, 0.2, 0), 1.2);
+                
+                const a1 = new THREE.Vector3(-1.5, 0, 1), a2 = new THREE.Vector3(1.5, 0, 1);
+                grp.add(createLine(a1, a2)); addLabel(grp, 'a', a2, new THREE.Vector3(0.2, 0.2, 0));
+                
+                const b1 = new THREE.Vector3(0, -2, -1), b2 = new THREE.Vector3(0, 2, -1);
+                grp.add(createLine(b1, b2, matLineAlt)); addLabel(grp, 'b', b2, new THREE.Vector3(0.2, 0.2, 0));
+                
+                const ptM = new THREE.Vector3(0, 0, -1);
+                grp.add(createPoint(ptM.x, ptM.y, ptM.z)); addLabel(grp, 'M', ptM);
+            }
+        }
+
+        // --- Scene: Angle between Skew Lines (с поетапно построяване и сектор) ---
+        let angleSkewCtx = null;
+        function initAngleSkew() {
+            angleSkewCtx = createBaseScene('angle-skew-canvas');
+            if (!angleSkewCtx) return;
+            updateAngleSkew('step1');
+            
+            document.querySelectorAll('input[name="angleSkewType"]').forEach(radio => {
+                radio.addEventListener('change', (e) => updateAngleSkew(e.target.value));
+            });
+        }
+
+        function updateAngleSkew(step) {
+            if (!angleSkewCtx) return;
+            const grp = angleSkewCtx.mainGroup;
+            grp.clear();
+            if (angleSkewCtx.timeoutId) clearTimeout(angleSkewCtx.timeoutId);
+
+            // Skew lines
+            const a1 = new THREE.Vector3(-2, 1, -1), a2 = new THREE.Vector3(2, 1, 1);
+            const b1 = new THREE.Vector3(-2, -1, 1), b2 = new THREE.Vector3(2, -1, -1);
+            
+            // Винаги показваме правата a
+            grp.add(createLine(a1, a2, matLine)); addLabel(grp, 'a', a2, new THREE.Vector3(0.2, 0.2, 0));
+            
+            if (step === 'step1') {
+                // Поетапно добавяне на втората права b за ефект
+                angleSkewCtx.timeoutId = setTimeout(() => {
+                    if (document.querySelector('input[name="angleSkewType"]:checked').value === 'step1') {
+                        grp.add(createLine(b1, b2, matLineAlt)); addLabel(grp, 'b', b2, new THREE.Vector3(0.2, 0.2, 0));
+                    }
+                }, 600);
+            } else if (step === 'step2') {
+                grp.add(createLine(b1, b2, matLineAlt)); addLabel(grp, 'b', b2, new THREE.Vector3(0.2, 0.2, 0));
+                const ptM = new THREE.Vector3(0, 1, 0); // Midpoint of a
+                // Поетапно добавяне на точката M
+                angleSkewCtx.timeoutId = setTimeout(() => {
+                    if (document.querySelector('input[name="angleSkewType"]:checked').value === 'step2') {
+                        grp.add(createPoint(ptM.x, ptM.y, ptM.z)); addLabel(grp, 'M', ptM);
+                    }
+                }, 800);
+            } else if (step === 'step3') {
+                grp.add(createLine(b1, b2, matLineAlt)); addLabel(grp, 'b', b2, new THREE.Vector3(0.2, 0.2, 0));
+                const ptM = new THREE.Vector3(0, 1, 0); 
+                grp.add(createPoint(ptM.x, ptM.y, ptM.z)); addLabel(grp, 'M', ptM);
+                
+                const b1_trans_1 = new THREE.Vector3(-2, 1, 1);
+                const b1_trans_2 = new THREE.Vector3(2, 1, -1);
+                // Поетапно построяване на успоредната права b1
+                angleSkewCtx.timeoutId = setTimeout(() => {
+                    if (document.querySelector('input[name="angleSkewType"]:checked').value === 'step3') {
+                        grp.add(createLine(b1_trans_1, b1_trans_2, matHigh3)); 
+                        addLabel(grp, 'b₁', b1_trans_2, new THREE.Vector3(0.2, 0.2, 0));
+                    }
+                }, 800);
+            } else if (step === 'step4') {
+                grp.add(createLine(b1, b2, new THREE.MeshPhongMaterial({ color: 0x10b981, transparent: true, opacity: 0.2 }))); 
+                addLabel(grp, 'b', b2, new THREE.Vector3(0.2, 0.2, 0));
+                const ptM = new THREE.Vector3(0, 1, 0); 
+                grp.add(createPoint(ptM.x, ptM.y, ptM.z)); addLabel(grp, 'M', ptM);
+                
+                const b1_trans_1 = new THREE.Vector3(-2, 1, 1);
+                const b1_trans_2 = new THREE.Vector3(2, 1, -1);
+                grp.add(createLine(b1_trans_1, b1_trans_2, matHigh3)); 
+                addLabel(grp, 'b₁', b1_trans_2, new THREE.Vector3(0.2, 0.2, 0));
+                
+                // Поетапно маркиране на ъгъла и добавяне на сектор
+                angleSkewCtx.timeoutId = setTimeout(() => {
+                    if (document.querySelector('input[name="angleSkewType"]:checked').value === 'step4') {
+                        // Изчертаваме маркировката за ъгъл φ между права 'a' и 'b1'
+                        grp.add(createSector(ptM, a2, b1_trans_1, 0.7, 0xeab308));
+                        
+                        // Изчисляване на ъглополовящата за перфектно позициониране на надписа
+                        let vA = a2.clone().sub(ptM).normalize();
+                        let vB = b1_trans_1.clone().sub(ptM).normalize();
+                        if (vA.dot(vB) < 0) vB.negate(); // Гарантираме остър ъгъл
+                        let bisector = vA.add(vB).normalize();
+                        let labelPos = ptM.clone().add(bisector.multiplyScalar(0.95)); // 0.7 е радиусът, 0.95 е точно извън него
+                        
+                        addLabel(grp, 'φ', labelPos, new THREE.Vector3(0,0,0), 0.9);
+                    }
+                }, 800);
+            }
+        }
+
+        // --- Scene 6: Theorems ---
+        let thmCtx = null;
+        function initTheorems() {
+            thmCtx = createBaseScene('theorems-canvas');
+            if (!thmCtx) return;
+            updateTheorems('th1');
+            
+            document.querySelectorAll('input[name="theoremType"]').forEach(radio => {
+                radio.addEventListener('change', (e) => updateTheorems(e.target.value));
+            });
+        }
+
+        function updateTheorems(type) {
+            if (!thmCtx) return;
+            const grp = thmCtx.mainGroup;
+            grp.clear();
+
+            if (type === 'th1') {
+                const a1 = new THREE.Vector3(-2, -1, 0), a2 = new THREE.Vector3(2, -1, 0);
+                grp.add(createLine(a1, a2)); addLabel(grp, 'a', a2, new THREE.Vector3(0.2, 0.2, 0));
+                const ptA = new THREE.Vector3(0, 1, 0);
+                grp.add(createPoint(ptA.x, ptA.y, ptA.z)); addLabel(grp, 'A', ptA);
+                const b1 = new THREE.Vector3(-2, 1, 0), b2 = new THREE.Vector3(2, 1, 0);
+                grp.add(createLine(b1, b2, matLineAlt)); addLabel(grp, 'b', b2, new THREE.Vector3(0.2, 0.2, 0));
+            } else if (type === 'th2') {
+                const a1 = new THREE.Vector3(-2, 1, 1), a2 = new THREE.Vector3(2, 1, 1);
+                const b1 = new THREE.Vector3(-2, 1, -1), b2 = new THREE.Vector3(2, 1, -1);
+                const c1 = new THREE.Vector3(-2, -1, 0), c2 = new THREE.Vector3(2, -1, 0);
+                grp.add(createLine(a1, a2, matLine)); addLabel(grp, 'a', a2, new THREE.Vector3(0.2, 0.2, 0));
+                grp.add(createLine(c1, c2, matLineAlt)); addLabel(grp, 'c', c2, new THREE.Vector3(0.2, 0.2, 0));
+                grp.add(createLine(b1, b2, matLine)); addLabel(grp, 'b', b2, new THREE.Vector3(0.2, 0.2, 0));
+            } else if (type === 'th3') {
+                const p = createPlane(4, 4);
+                p.rotation.x = -Math.PI / 4;
+                grp.add(p); addLabel(grp, 'α', new THREE.Vector3(-1.5, 1, -1.5), new THREE.Vector3(0, 0.2, 0), 1.2);
+                
+                const a1 = new THREE.Vector3(-1, -2, 0), a2 = new THREE.Vector3(-1, 2, 0);
+                const b1 = new THREE.Vector3(1, -2, 0), b2 = new THREE.Vector3(1, 2, 0);
+                grp.add(createLine(a1, a2)); addLabel(grp, 'a', a2, new THREE.Vector3(0.2, 0.2, 0));
+                grp.add(createLine(b1, b2, matLineAlt)); addLabel(grp, 'b', b2, new THREE.Vector3(0.2, 0.2, 0));
+                
+                const ptM1 = new THREE.Vector3(-1, 0, 0), ptM2 = new THREE.Vector3(1, 0, 0);
+                grp.add(createPoint(ptM1.x, ptM1.y, ptM1.z)); addLabel(grp, 'M₁', ptM1, new THREE.Vector3(-0.4, 0.2, 0));
+                grp.add(createPoint(ptM2.x, ptM2.y, ptM2.z)); addLabel(grp, 'M₂', ptM2, new THREE.Vector3(0.4, 0.2, 0));
+            }
+        }
+
+        // Помощна функция за генериране на под (задачите)
+        function createFloor(yOffset = -1) {
+            const grid = new THREE.GridHelper(10, 10, 0x94a3b8, 0xcbd5e1);
+            grid.position.y = yOffset;
+            const plane = createPlane(10, 10);
+            plane.position.y = yOffset - 0.01;
+            plane.material = new THREE.MeshBasicMaterial({color: 0xf1f5f9, transparent: true, opacity: 0.15});
+            const grp = new THREE.Group();
+            grp.add(grid);
+            grp.add(plane);
+            return grp;
+        }
+
+        // --- 7. Practical Tasks Logic ---
+        function initTasks() {
+            const ctx1 = createBaseScene('task1-canvas');
+            const ctx2 = createBaseScene('task2-canvas');
+            const ctx3 = createBaseScene('task3-canvas');
+            const ctx4 = createBaseScene('task4-canvas');
+            const ctx5 = createBaseScene('task5-canvas');
+            const ctx6 = createBaseScene('task6-canvas');
+            const ctx7 = createBaseScene('task7-canvas');
+            
+            function getCubeV(s=1.2) {
+                return {
+                    A: new THREE.Vector3(-s, -s, s), B: new THREE.Vector3(s, -s, s),
+                    C: new THREE.Vector3(s, -s, -s), D: new THREE.Vector3(-s, -s, -s),
+                    A1: new THREE.Vector3(-s, s, s), B1: new THREE.Vector3(s, s, s),
+                    C1: new THREE.Vector3(s, s, -s), D1: new THREE.Vector3(-s, s, -s)
+                };
+            }
+            
+            function drawCubeBase(grp, v, excludeFront=false) {
+                const edges = [
+                    ['A','B'],['B','C'],['C','D'],['D','A'],
+                    ['A1','B1'],['B1','C1'],['C1','D1'],['D1','A1'],
+                    ['A','A1'],['B','B1'],['C','C1'],['D','D1']
+                ];
+                edges.forEach(([p1, p2]) => {
+                    if(excludeFront && (p1==='A'||p1==='B'||p1==='A1'||p1==='B1') && (p2==='A'||p2==='B'||p2==='A1'||p2==='B1')) {
+                        if (p1==='A' && p2==='A1') {} // keep back/sides
+                        else return; // exclude front for "room" look
+                    }
+                    grp.add(createLine(v[p1], v[p2], matBaseLine, 0.02));
+                });
+                for(let k in v) { grp.add(createPoint(v[k].x, v[k].y, v[k].z)); }
+                for(let k in v) {
+                    addLabel(grp, k, v[k], new THREE.Vector3(0, k.includes('1')?0.3:-0.3, 0), 0.7);
+                }
+            }
+
+            // Task 1 Logic (Table)
+            function updateT1(val) {
+                if(!ctx1) return;
+                ctx1.mainGroup.clear();
+                
+                ctx1.mainGroup.add(createFloor(-1.0));
+                
+                const tableGrp = new THREE.Group();
+                ctx1.mainGroup.add(tableGrp);
+                ctx1.tableGrp = tableGrp;
+
+                if(val === 't1_3') {
+                    const p1 = new THREE.Vector3(-1.2, -1, 0.8), p2 = new THREE.Vector3(1.2, -1, 0.8), p3 = new THREE.Vector3(0, -1, -1.2);
+                    tableGrp.add(createPoint(p1.x, p1.y, p1.z)); addLabel(tableGrp, 'A', p1, new THREE.Vector3(0,-0.3,0));
+                    tableGrp.add(createPoint(p2.x, p2.y, p2.z)); addLabel(tableGrp, 'B', p2, new THREE.Vector3(0,-0.3,0));
+                    tableGrp.add(createPoint(p3.x, p3.y, p3.z)); addLabel(tableGrp, 'C', p3, new THREE.Vector3(0,-0.3,0));
+                    tableGrp.add(createLine(p1, new THREE.Vector3(p1.x, 0.5, p1.z), matBaseLine));
+                    tableGrp.add(createLine(p2, new THREE.Vector3(p2.x, 0.5, p2.z), matBaseLine));
+                    tableGrp.add(createLine(p3, new THREE.Vector3(p3.x, 0.5, p3.z), matBaseLine));
+                    
+                    const topShape = new THREE.Shape();
+                    // Координатите са коригирани, за да покриват точно краката на масата
+                    topShape.moveTo(-1.6, -1.1); 
+                    topShape.lineTo(1.6, -1.1); 
+                    topShape.lineTo(0, 1.6);
+                    
+                    // Добавена е дебелина (depth) на плота, за да изглежда реалистично и да не се "пробива"
+                    const extrudeSettings = { depth: 0.1, bevelEnabled: true, bevelThickness: 0.02, bevelSize: 0.02, bevelSegments: 2 };
+                    const topGeo = new THREE.ExtrudeGeometry(topShape, extrudeSettings);
+                    const topMesh = new THREE.Mesh(topGeo, new THREE.MeshPhongMaterial({color: 0x8b5cf6}));
+                    topMesh.rotation.x = -Math.PI/2;
+                    topMesh.position.y = 0.5; // Сяда точно върху краката
+                    tableGrp.add(topMesh);
+                    
+                    ctx1.isWobbling = false;
+                } else {
+                    const p1 = new THREE.Vector3(-1, -1, 1), p2 = new THREE.Vector3(1, -1, 1);
+                    const p3 = new THREE.Vector3(1, -1, -1), p4 = new THREE.Vector3(-1, -0.6, -1); // Къс крак
+                    
+                    tableGrp.add(createPoint(p1.x, p1.y, p1.z)); addLabel(tableGrp, 'A', p1, new THREE.Vector3(0,-0.3,0));
+                    tableGrp.add(createPoint(p2.x, p2.y, p2.z)); addLabel(tableGrp, 'B', p2, new THREE.Vector3(0,-0.3,0));
+                    tableGrp.add(createPoint(p3.x, p3.y, p3.z)); addLabel(tableGrp, 'C', p3, new THREE.Vector3(0,-0.3,0));
+                    tableGrp.add(createPoint(p4.x, p4.y, p4.z)); addLabel(tableGrp, 'D', p4, new THREE.Vector3(0,-0.3,0));
+                    
+                    tableGrp.add(createLine(p1, new THREE.Vector3(p1.x, 0.5, p1.z), matBaseLine));
+                    tableGrp.add(createLine(p2, new THREE.Vector3(p2.x, 0.5, p2.z), matBaseLine));
+                    tableGrp.add(createLine(p3, new THREE.Vector3(p3.x, 0.5, p3.z), matBaseLine));
+                    tableGrp.add(createLine(p4, new THREE.Vector3(p4.x, 0.5, p4.z), matBaseLine));
+                    
+                    // Използваме BoxGeometry вместо PlaneGeometry, за да има дебелина плотът
+                    const topGeo = new THREE.BoxGeometry(2.6, 0.1, 2.6);
+                    const topMesh = new THREE.Mesh(topGeo, new THREE.MeshPhongMaterial({color: 0x8b5cf6}));
+                    topMesh.position.y = 0.55; // Сяда точно върху краката (0.5 + 0.1/2)
+                    tableGrp.add(topMesh);
+                    
+                    ctx1.isWobbling = true;
+                    ctx1.wobbleTime = 0;
+                }
+            }
+            document.querySelectorAll('input[name="t1"]').forEach(r => r.addEventListener('change', e => updateT1(e.target.value)));
+            updateT1('t1_3');
+
+            // Task 2 Logic (3 lines)
+            function updateT2(val) {
+                if(!ctx2) return;
+                ctx2.mainGroup.clear();
+                ctx2.mainGroup.add(createFloor(-2.5));
+                const o = new THREE.Vector3(0,0,0);
+                ctx2.mainGroup.add(createPoint(0,0,0)); addLabel(ctx2.mainGroup, 'O', o);
+                if(val === 't2_1') {
+                    const l1 = new THREE.Vector3(2,0,0), l2 = new THREE.Vector3(1.5,0,1.5), l3 = new THREE.Vector3(1.5,0,-1.5);
+                    ctx2.mainGroup.add(createLine(new THREE.Vector3(-2,0,0), l1)); addLabel(ctx2.mainGroup, 'a', l1, new THREE.Vector3(0.2,0.2,0));
+                    ctx2.mainGroup.add(createLine(new THREE.Vector3(-1.5,0,-1.5), l2)); addLabel(ctx2.mainGroup, 'b', l2, new THREE.Vector3(0.2,0.2,0));
+                    ctx2.mainGroup.add(createLine(new THREE.Vector3(-1.5,0,1.5), l3)); addLabel(ctx2.mainGroup, 'c', l3, new THREE.Vector3(0.2,0.2,0));
+                    ctx2.mainGroup.add(createPlane(4,4)); addLabel(ctx2.mainGroup, 'α', new THREE.Vector3(-1.5,0,-1.5), new THREE.Vector3(0,0.2,0), 1.2);
+                } else {
+                    const l1 = new THREE.Vector3(2,0,0), l2 = new THREE.Vector3(0,2,0), l3 = new THREE.Vector3(0,0,2);
+                    ctx2.mainGroup.add(createLine(new THREE.Vector3(-2,0,0), l1)); addLabel(ctx2.mainGroup, 'a', l1, new THREE.Vector3(0.2,0.2,0));
+                    ctx2.mainGroup.add(createLine(new THREE.Vector3(0,-2,0), l2)); addLabel(ctx2.mainGroup, 'b', l2, new THREE.Vector3(0.2,0.2,0));
+                    ctx2.mainGroup.add(createLine(new THREE.Vector3(0,0,-2), l3)); addLabel(ctx2.mainGroup, 'c', l3, new THREE.Vector3(0.2,0.2,0));
+                    
+                    // Използваме MeshBasicMaterial за да се виждат равнините отлично и в двата режима (без нужда от осветление на нормалите им)
+                    const matPlane1 = new THREE.MeshBasicMaterial({ color: 0x3b82f6, transparent: true, opacity: 0.4, side: THREE.DoubleSide });
+                    const matPlane2 = new THREE.MeshBasicMaterial({ color: 0xa855f7, transparent: true, opacity: 0.4, side: THREE.DoubleSide });
+                    const matPlane3 = new THREE.MeshBasicMaterial({ color: 0x10b981, transparent: true, opacity: 0.4, side: THREE.DoubleSide });
+
+                    const geo1 = new THREE.BufferGeometry().setFromPoints([o, l1, l2]);
+                    const geo2 = new THREE.BufferGeometry().setFromPoints([o, l2, l3]);
+                    const geo3 = new THREE.BufferGeometry().setFromPoints([o, l3, l1]);
+                    
+                    ctx2.mainGroup.add(new THREE.Mesh(geo1, matPlane1), new THREE.Mesh(geo2, matPlane2), new THREE.Mesh(geo3, matPlane3));
+                    addLabel(ctx2.mainGroup, 'α', new THREE.Vector3(1, 1, 0), new THREE.Vector3(0, 0, 0), 1.2);
+                    addLabel(ctx2.mainGroup, 'β', new THREE.Vector3(0, 1, 1), new THREE.Vector3(0, 0, 0), 1.2);
+                    addLabel(ctx2.mainGroup, 'γ', new THREE.Vector3(1, 0, 1), new THREE.Vector3(0, 0, 0), 1.2);
+                }
+            }
+            document.querySelectorAll('input[name="t2"]').forEach(r => r.addEventListener('change', e => updateT2(e.target.value)));
+            updateT2('t2_1');
+
+            // Task 3 Logic (4 points)
+            function updateT3(val) {
+                if(!ctx3) return;
+                ctx3.mainGroup.clear();
+                ctx3.mainGroup.add(createFloor(-1.0));
+                if(val === 't3_yes') {
+                    const p1 = new THREE.Vector3(-1.5, 0, 0), p2 = new THREE.Vector3(0, 0, 0), p3 = new THREE.Vector3(1.5, 0, 0), p4 = new THREE.Vector3(0, 0, 1.5);
+                    ctx3.mainGroup.add(createPoint(p1.x, p1.y, p1.z)); addLabel(ctx3.mainGroup, 'A', p1);
+                    ctx3.mainGroup.add(createPoint(p2.x, p2.y, p2.z)); addLabel(ctx3.mainGroup, 'B', p2);
+                    ctx3.mainGroup.add(createPoint(p3.x, p3.y, p3.z)); addLabel(ctx3.mainGroup, 'C', p3);
+                    ctx3.mainGroup.add(createPoint(p4.x, p4.y, p4.z)); addLabel(ctx3.mainGroup, 'D', p4);
+                    const l1 = new THREE.Vector3(2,0,0);
+                    ctx3.mainGroup.add(createLine(new THREE.Vector3(-2,0,0), l1)); addLabel(ctx3.mainGroup, 'a', l1, new THREE.Vector3(0.2,0.2,0));
+                    ctx3.mainGroup.add(createPlane(4,4)); addLabel(ctx3.mainGroup, 'α', new THREE.Vector3(-1.5,0,-1.5), new THREE.Vector3(0,0.2,0), 1.2);
+                } else {
+                    const t1 = new THREE.Vector3(-1, -1, 1), t2 = new THREE.Vector3(1, -1, 1), t3 = new THREE.Vector3(0, -1, -1), t4 = new THREE.Vector3(0, 1.5, 0);
+                    ctx3.mainGroup.add(createPoint(t1.x, t1.y, t1.z)); addLabel(ctx3.mainGroup, 'A', t1, new THREE.Vector3(0,-0.3,0));
+                    ctx3.mainGroup.add(createPoint(t2.x, t2.y, t2.z)); addLabel(ctx3.mainGroup, 'B', t2, new THREE.Vector3(0,-0.3,0));
+                    ctx3.mainGroup.add(createPoint(t3.x, t3.y, t3.z)); addLabel(ctx3.mainGroup, 'C', t3, new THREE.Vector3(0,-0.3,0));
+                    ctx3.mainGroup.add(createPoint(t4.x, t4.y, t4.z)); addLabel(ctx3.mainGroup, 'D', t4);
+                    ctx3.mainGroup.add(createLine(t1, t2, matBaseLine, 0.02), createLine(t2, t3, matBaseLine, 0.02), createLine(t3, t1, matBaseLine, 0.02));
+                    ctx3.mainGroup.add(createLine(t1, t4, matBaseLine, 0.02), createLine(t2, t4, matBaseLine, 0.02), createLine(t3, t4, matBaseLine, 0.02));
+                }
+            }
+            document.querySelectorAll('input[name="t3"]').forEach(r => r.addEventListener('change', e => updateT3(e.target.value)));
+            updateT3('t3_no');
+
+            // Task 4 Logic (Room edges)
+            function updateT4(val) {
+                if(!ctx4) return;
+                ctx4.mainGroup.clear();
+                ctx4.mainGroup.add(createFloor(-1.2));
+                const v = getCubeV(1.2);
+                drawCubeBase(ctx4.mainGroup, v, true); 
+                if(val === 't4_par') {
+                    ctx4.mainGroup.add(createLine(v.D, v.C, matHigh1, 0.05), createLine(v.D1, v.C1, matHigh1, 0.05));
+                } else if(val === 't4_int') {
+                    ctx4.mainGroup.add(createLine(v.D, v.C, matHigh1, 0.05), createLine(v.D, v.D1, matHigh2, 0.05));
+                } else if(val === 't4_skew') {
+                    ctx4.mainGroup.add(createLine(v.D, v.C, matHigh1, 0.05), createLine(v.B, v.B1, matHigh2, 0.05));
+                }
+            }
+            document.querySelectorAll('input[name="t4"]').forEach(r => r.addEventListener('change', e => updateT4(e.target.value)));
+            updateT4('t4_par');
+
+            // Task 5 Logic (Cube A1D1)
+            function updateT5(val) {
+                if(!ctx5) return;
+                ctx5.mainGroup.clear();
+                ctx5.mainGroup.add(createFloor(-1.2));
+                const v = getCubeV(1.2);
+                drawCubeBase(ctx5.mainGroup, v);
+                ctx5.mainGroup.add(createLine(v.A1, v.D1, matHigh3, 0.07)); // Base edge
+                
+                if(val === 't5_a') {
+                    ctx5.mainGroup.add(createLine(v.A1, v.B1, matHigh1, 0.05), createLine(v.A1, v.A, matHigh1, 0.05));
+                    ctx5.mainGroup.add(createLine(v.D1, v.C1, matHigh1, 0.05), createLine(v.D1, v.D, matHigh1, 0.05));
+                } else if(val === 't5_b') {
+                    ctx5.mainGroup.add(createLine(v.A, v.D, matHigh2, 0.05), createLine(v.B, v.C, matHigh2, 0.05), createLine(v.B1, v.C1, matHigh2, 0.05));
+                } else if(val === 't5_c') {
+                    ctx5.mainGroup.add(createLine(v.A, v.B, matHigh1, 0.05), createLine(v.D, v.C, matHigh1, 0.05));
+                    ctx5.mainGroup.add(createLine(v.B, v.B1, matHigh1, 0.05), createLine(v.C, v.C1, matHigh1, 0.05));
+                }
+            }
+            document.querySelectorAll('input[name="t5"]').forEach(r => r.addEventListener('change', e => updateT5(e.target.value)));
+            updateT5('t5_a');
+
+            // Task 6 Logic (Tetrahedron skew)
+            function updateT6(val) {
+                if(!ctx6) return;
+                ctx6.mainGroup.clear();
+                ctx6.mainGroup.add(createFloor(-1.0));
+                const v = { A: new THREE.Vector3(-1,-1,1), B: new THREE.Vector3(1,-1,1), C: new THREE.Vector3(0,-1,-1), D: new THREE.Vector3(0,1.5,0) };
+                
+                ctx6.mainGroup.add(createLine(v.A, v.B, matBaseLine, 0.02), createLine(v.B, v.C, matBaseLine, 0.02), createLine(v.C, v.A, matBaseLine, 0.02));
+                ctx6.mainGroup.add(createLine(v.A, v.D, matBaseLine, 0.02), createLine(v.B, v.D, matBaseLine, 0.02), createLine(v.C, v.D, matBaseLine, 0.02));
+                
+                for(let k in v) { ctx6.mainGroup.add(createPoint(v[k].x, v[k].y, v[k].z)); }
+                for(let k in v) {
+                    addLabel(ctx6.mainGroup, k, v[k], new THREE.Vector3(0, k==='D'?0.3:-0.3, 0), 0.8);
+                }
+
+                if(val === 't6_1') {
+                    ctx6.mainGroup.add(createLine(v.A, v.B, matHigh1, 0.06), createLine(v.C, v.D, matHigh2, 0.06));
+                } else if(val === 't6_2') {
+                    ctx6.mainGroup.add(createLine(v.A, v.C, matHigh1, 0.06), createLine(v.B, v.D, matHigh2, 0.06));
+                } else if(val === 't6_3') {
+                    ctx6.mainGroup.add(createLine(v.A, v.D, matHigh1, 0.06), createLine(v.B, v.C, matHigh2, 0.06));
+                }
+            }
+            document.querySelectorAll('input[name="t6"]').forEach(r => r.addEventListener('change', e => updateT6(e.target.value)));
+            updateT6('t6_1');
+
+            // Task 7 Logic (Angles and Sectors)
+            function updateT7(val) {
+                if(!ctx7) return;
+                ctx7.mainGroup.clear();
+                ctx7.mainGroup.add(createFloor(-1.2));
+                const v = getCubeV(1.2);
+                drawCubeBase(ctx7.mainGroup, v);
+
+                if(val === 't7_a') {
+                    ctx7.mainGroup.add(createLine(v.A, v.B1, matHigh1, 0.05), createLine(v.C, v.C1, matHigh2, 0.05));
+                    ctx7.mainGroup.add(createLine(v.B, v.B1, matHigh3, 0.04), createLine(v.A, v.B, matBaseLine, 0.02)); // Translation BB1 and base triangle
+                    
+                    // Изчертаваме маркировката за ъгъл (сектор) при B1
+                    ctx7.mainGroup.add(createSector(v.B1, v.A, v.B, 0.5, 0xeab308));
+                    
+                    // Позициониране чрез ъглополовяща
+                    let vA = v.A.clone().sub(v.B1).normalize();
+                    let vB = v.B.clone().sub(v.B1).normalize();
+                    if (vA.dot(vB) < 0) vB.negate();
+                    let bisector = vA.add(vB).normalize();
+                    let labelPos = v.B1.clone().add(bisector.multiplyScalar(0.75)); // радиусът е 0.5
+                    
+                    addLabel(ctx7.mainGroup, "45°", labelPos, new THREE.Vector3(0, 0, 0), 0.7);
+                } else if(val === 't7_b') {
+                    ctx7.mainGroup.add(createLine(v.A, v.C, matHigh1, 0.05), createLine(v.B1, v.D1, matHigh2, 0.05));
+                    ctx7.mainGroup.add(createLine(v.B, v.D, matHigh3, 0.04)); // Translation BD
+                    
+                    const centerO = new THREE.Vector3(0, -1.2, 0);
+                    // Изчертаваме маркировката за ъгъл (сектор) при пресечната точка O
+                    ctx7.mainGroup.add(createSector(centerO, v.B, v.C, 0.6, 0xeab308));
+                    
+                    // Позициониране чрез ъглополовяща
+                    let vA = v.B.clone().sub(centerO).normalize();
+                    let vB = v.C.clone().sub(centerO).normalize();
+                    if (vA.dot(vB) < 0) vB.negate();
+                    let bisector = vA.add(vB).normalize();
+                    let labelPos = centerO.clone().add(bisector.multiplyScalar(0.85)); // радиусът е 0.6
+                    
+                    addLabel(ctx7.mainGroup, "90°", labelPos, new THREE.Vector3(0, 0, 0), 0.7);
+                }
+            }
+            document.querySelectorAll('input[name="t7"]').forEach(r => r.addEventListener('change', e => updateT7(e.target.value)));
+            updateT7('t7_a');
+            
+            // Включваме автоматично въртене за всички задачи, за да се вижда 3D ефектът веднага
+            [ctx1, ctx2, ctx3, ctx4, ctx5, ctx6, ctx7].forEach(ctx => {
+                if (ctx && ctx.controls) {
+                    ctx.controls.autoRotate = true;
+                    ctx.controls.autoRotateSpeed = 1.0;
+                }
+            });
+        }
+
+        // Animation Loop
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // Анимация за клатещата се маса (Задача 1)
+            if (scenes.length > 0) {
+                const ctx1 = scenes.find(s => s.container && s.container.id === 'task1-canvas');
+                if (ctx1 && ctx1.isWobbling && ctx1.tableGrp) {
+                    ctx1.wobbleTime += 0.08;
+                    const rock = Math.sin(ctx1.wobbleTime);
+                    const angle = rock > 0 ? rock * 0.15 : 0; // Остава стабилна за половин цикъл, когато опре в пода
+                    ctx1.tableGrp.setRotationFromAxisAngle(new THREE.Vector3(1, 0, 1).normalize(), angle);
+                }
+            }
+
+            scenes.forEach(({ scene, camera, renderer, controls }) => {
+                if (controls) controls.update();
+                if (renderer && scene && camera) renderer.render(scene, camera);
+            });
+        }
+
+        // Handle Window Resize
+        window.addEventListener('resize', () => {
+            scenes.forEach(({ camera, renderer, container }) => {
+                if (camera && renderer && container) {
+                    camera.aspect = container.clientWidth / container.clientHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(container.clientWidth, container.clientHeight);
+                }
+            });
+        });
+
+        // Initialize Everything on Load securely
+        window.addEventListener('load', function() {
+            try {
+                if (window.lucide) lucide.createIcons();
+                initQuizzes();
+                
+                // Init 3D Scenes
+                initBasicObjects();
+                initNotations();
+                initAxioms();
+                initPlaneDefs();
+                initPositions();
+                initAngleSkew();
+                initTheorems();
+                initTasks(); 
+
+                // Start rendering
+                animate();
+            } catch (error) {
+                console.error("Грешка при зареждане на чертежите:", error);
             }
         });
-        // --- QUIZ LOGIC ---
-        function attachQuizLogic(containerId) {
-            const container = document.getElementById(containerId);
-            const buttons = container.querySelectorAll('.quiz-btn');
-            const feedback = container.querySelector('.quiz-feedback');
-
-            buttons.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    buttons.forEach(b => {
-                        b.classList.remove('correct', 'wrong');
-                        b.disabled = true;
-                    });
-
-                    const isCorrect = this.getAttribute('data-correct') === 'true';
-                    if (isCorrect) {
-                        this.classList.add('correct');
-                        feedback.innerHTML = 'Правилно! Отличен отговор. ' + (this.dataset.explanation || '');
-                        feedback.className = 'quiz-feedback text-sm font-bold mt-3 text-green-600 dark:text-green-400 block';
-                    } else {
-                        this.classList.add('wrong');
-                        feedback.textContent = 'Грешка. Опитай отново!';
-                        feedback.className = 'quiz-feedback text-sm font-bold mt-3 text-red-600 dark:text-red-400 block';
-                        setTimeout(() => {
-                            buttons.forEach(b => b.disabled = false);
-                            this.classList.remove('wrong');
-                            feedback.className = 'quiz-feedback hidden text-sm font-bold mt-3';
-                        }, 2000);
-                    }
-                    if (window.MathJax) MathJax.typesetPromise([feedback]);
-                });
-            });
-        }
-
-        attachQuizLogic('quiz-container-1');
-        attachQuizLogic('quiz-container-2');
-
-        // ==========================================
-        // THREE.JS IMPLEMENTATION
-        // ==========================================
-        const scenesData = [];
-
-        function initThreeJS() {
-            const colors = {
-                point: 0xef4444,
-                line: 0x3b82f6,
-                plane: 0x10b981,
-                plane2: 0x8b5cf6,
-                highlight: 0xeab308,
-                bgDark: 0x0f172a
-            };
-
-            function easeOutCubic(t) {
-                return 1 - Math.pow(1 - t, 3);
-            }
-
-            function createSceneContext(containerId) {
-                const container = document.getElementById(containerId);
-                const scene = new THREE.Scene();
-                scene.background = new THREE.Color(colors.bgDark);
-
-                const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-                camera.position.set(5, 5, 5);
-
-                const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-                renderer.setSize(container.clientWidth, container.clientHeight);
-                renderer.setPixelRatio(window.devicePixelRatio);
-                container.appendChild(renderer.domElement);
-
-                const controls = new THREE.OrbitControls(camera, renderer.domElement);
-                controls.enableDamping = true;
-                controls.dampingFactor = 0.05;
-                controls.autoRotate = true;
-                controls.autoRotateSpeed = 1.0;
-
-                const addLights = () => {
-                    scene.add(new THREE.AmbientLight(0xffffff, 0.72));
-                    const dirLight = new THREE.DirectionalLight(0xffffff, 0.9);
-                    dirLight.position.set(10, 10, 10);
-                    scene.add(dirLight);
-                };
-                addLights();
-
-                const ctx = {
-                    container,
-                    scene,
-                    camera,
-                    renderer,
-                    controls,
-                    addLights,
-                    revealAnimations: []
-                };
-                scenesData.push(ctx);
-                return ctx;
-            }
-
-            function resetScene(ctx) {
-                ctx.scene.clear();
-                ctx.revealAnimations = [];
-                ctx.addLights();
-            }
-
-            function schedulePointReveal(ctx, mesh, delay = 0, duration = 500) {
-                mesh.scale.setScalar(0.001);
-                ctx.revealAnimations.push({ type: 'point', mesh, delay, duration, start: performance.now() });
-            }
-
-            function scheduleLineReveal(ctx, mesh, delay = 0, duration = 700) {
-                mesh.scale.set(1, 0.001, 1);
-                ctx.revealAnimations.push({ type: 'line', mesh, delay, duration, start: performance.now() });
-            }
-
-            function schedulePlaneReveal(ctx, group, delay = 0, duration = 900) {
-                group.scale.set(0.001, 1, 0.001);
-                if (group.userData.planeMaterial) group.userData.planeMaterial.opacity = 0;
-                if (group.userData.gridMaterial) group.userData.gridMaterial.opacity = 0;
-                ctx.revealAnimations.push({ type: 'plane', group, delay, duration, start: performance.now() });
-            }
-
-            function updateRevealAnimations(ctx, now) {
-                ctx.revealAnimations.forEach(anim => {
-                    const elapsed = now - anim.start - anim.delay;
-                    if (elapsed <= 0) return;
-
-                    const t = Math.min(elapsed / anim.duration, 1);
-                    const k = easeOutCubic(t);
-
-                    if (anim.type === 'point') {
-                        anim.mesh.scale.setScalar(Math.max(0.001, k));
-                    } else if (anim.type === 'line') {
-                        anim.mesh.scale.set(1, Math.max(0.001, k), 1);
-                    } else if (anim.type === 'plane') {
-                        anim.group.scale.set(Math.max(0.001, k), 1, Math.max(0.001, k));
-                        if (anim.group.userData.planeMaterial) {
-                            anim.group.userData.planeMaterial.opacity = 0.3 * k;
-                        }
-                        if (anim.group.userData.gridMaterial) {
-                            anim.group.userData.gridMaterial.opacity = 0.2 * k;
-                        }
-                    } else if (anim.type === 'custom-angle-opacity') {
-                        anim.material.opacity = (anim.maxOpacity || 0.7) * k;
-                    }
-                });
-            }
-
-            function addPoint(ctx, x, y, z, color = colors.point, radius = 0.15) {
-                const mesh = new THREE.Mesh(
-                    new THREE.SphereGeometry(radius, 32, 32),
-                    new THREE.MeshStandardMaterial({ color: color, roughness: 0.2, metalness: 0.1 })
-                );
-                mesh.position.set(x, y, z);
-                ctx.scene.add(mesh);
-                return mesh;
-            }
-
-            function addLine(ctx, p1, p2, color = colors.line, radius = 0.03) {
-                const distance = p1.distanceTo(p2);
-                const mesh = new THREE.Mesh(
-                    new THREE.CylinderGeometry(radius, radius, distance, 16),
-                    new THREE.MeshStandardMaterial({ color: color, roughness: 0.4 })
-                );
-                mesh.position.copy(p1).lerp(p2, 0.5);
-                mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), p2.clone().sub(p1).normalize());
-                ctx.scene.add(mesh);
-                return mesh;
-            }
-
-            function addPlane(ctx, size = 6, color = colors.plane, opacity = 0.3) {
-                const group = new THREE.Group();
-
-                const planeMaterial = new THREE.MeshStandardMaterial({
-                    color: color,
-                    side: THREE.DoubleSide,
-                    transparent: true,
-                    opacity: opacity,
-                    depthWrite: false
-                });
-
-                const plane = new THREE.Mesh(new THREE.PlaneGeometry(size, size), planeMaterial);
-                plane.rotation.x = Math.PI / 2;
-                group.add(plane);
-
-                const grid = new THREE.GridHelper(size, 10, 0xffffff, 0xffffff);
-                grid.material.opacity = 0.2;
-                grid.material.transparent = true;
-                group.add(grid);
-
-                group.userData.planeMaterial = planeMaterial;
-                group.userData.gridMaterial = grid.material;
-                ctx.scene.add(group);
-                return group;
-            }
-
-            // Scene 1: basic objects
-            const ctx1 = createSceneContext('basic-objects-canvas');
-            ctx1.camera.position.set(4, 3, 6);
-            const basicPlane = addPlane(ctx1, 5);
-            const basicP1 = addPoint(ctx1, 0, 0, 0);
-            const basicP2 = addPoint(ctx1, 1, 1.5, -1);
-            const basicP3 = addPoint(ctx1, -2, 0, 1);
-            const basicLine = addLine(ctx1, new THREE.Vector3(-3, 1, -2), new THREE.Vector3(3, 1, 2));
-            schedulePlaneReveal(ctx1, basicPlane, 0, 900);
-            schedulePointReveal(ctx1, basicP1, 250);
-            schedulePointReveal(ctx1, basicP2, 500);
-            schedulePointReveal(ctx1, basicP3, 750);
-            scheduleLineReveal(ctx1, basicLine, 1050);
-
-            // Scene 2: notation
-            const ctx2 = createSceneContext('notation-canvas');
-            ctx2.camera.position.set(4, 3, 4);
-
-            function buildNotation(type) {
-                resetScene(ctx2);
-                let p1, p2, plane, line, point;
-
-                switch (type) {
-                    case 'pt_in_line':
-                        p1 = new THREE.Vector3(-3, 0, 0);
-                        p2 = new THREE.Vector3(3, 0, 0);
-                        line = addLine(ctx2, p1, p2);
-                        point = addPoint(ctx2, 0, 0, 0);
-                        scheduleLineReveal(ctx2, line, 0);
-                        schedulePointReveal(ctx2, point, 500);
-                        break;
-                    case 'pt_notin_line':
-                        p1 = new THREE.Vector3(-3, 0, 0);
-                        p2 = new THREE.Vector3(3, 0, 0);
-                        line = addLine(ctx2, p1, p2);
-                        point = addPoint(ctx2, 0, 1.5, 0);
-                        scheduleLineReveal(ctx2, line, 0);
-                        schedulePointReveal(ctx2, point, 500);
-                        break;
-                    case 'pt_in_plane':
-                        plane = addPlane(ctx2, 5);
-                        point = addPoint(ctx2, 1, 0, -1);
-                        schedulePlaneReveal(ctx2, plane, 0);
-                        schedulePointReveal(ctx2, point, 550);
-                        break;
-                    case 'pt_notin_plane':
-                        plane = addPlane(ctx2, 5);
-                        point = addPoint(ctx2, 0, 2, 0);
-                        schedulePlaneReveal(ctx2, plane, 0);
-                        schedulePointReveal(ctx2, point, 550);
-                        break;
-                    case 'line_in_plane':
-                        plane = addPlane(ctx2, 5);
-                        p1 = new THREE.Vector3(-2, 0, -1);
-                        p2 = new THREE.Vector3(2, 0, 1);
-                        line = addLine(ctx2, p1, p2);
-                        schedulePlaneReveal(ctx2, plane, 0);
-                        scheduleLineReveal(ctx2, line, 650);
-                        break;
-                    case 'line_notin_plane':
-                        plane = addPlane(ctx2, 5);
-                        p1 = new THREE.Vector3(-2, 2, -1);
-                        p2 = new THREE.Vector3(2, 2, 1);
-                        line = addLine(ctx2, p1, p2);
-                        schedulePlaneReveal(ctx2, plane, 0);
-                        scheduleLineReveal(ctx2, line, 650);
-                        break;
-                    case 'line_intersect_plane':
-                        plane = addPlane(ctx2, 5);
-                        p1 = new THREE.Vector3(-2, -2, -2);
-                        p2 = new THREE.Vector3(2, 2, 2);
-                        line = addLine(ctx2, p1, p2);
-                        point = addPoint(ctx2, 0, 0, 0, colors.highlight, 0.2);
-                        schedulePlaneReveal(ctx2, plane, 0);
-                        scheduleLineReveal(ctx2, line, 550);
-                        schedulePointReveal(ctx2, point, 1200);
-                        break;
-                }
-            }
-
-            buildNotation('pt_in_line');
-            document.querySelectorAll('input[name="notType"]').forEach(radio =>
-                radio.addEventListener('change', (e) => buildNotation(e.target.value))
-            );
-
-            // Scene 3: axioms
-            const ctx3 = createSceneContext('axioms-canvas');
-            ctx3.camera.position.set(5, 4, 5);
-
-            function buildAxioms(type) {
-                resetScene(ctx3);
-
-                if (type === 'ax1') {
-                    const pA = addPoint(ctx3, 1, 0, 1);
-                    const pB = addPoint(ctx3, -1, 0, -1);
-                    const pC = addPoint(ctx3, -1, 0, 1);
-                    const plane = addPlane(ctx3, 5);
-                    schedulePointReveal(ctx3, pA, 0);
-                    schedulePointReveal(ctx3, pB, 300);
-                    schedulePointReveal(ctx3, pC, 600);
-                    schedulePlaneReveal(ctx3, plane, 950);
-                } else if (type === 'ax2') {
-                    const plane = addPlane(ctx3, 5);
-                    const pA = addPoint(ctx3, -2, 0, -1);
-                    const pB = addPoint(ctx3, 2, 0, 1);
-                    const line = addLine(ctx3, new THREE.Vector3(-3, 0, -1.5), new THREE.Vector3(3, 0, 1.5));
-                    schedulePlaneReveal(ctx3, plane, 0);
-                    schedulePointReveal(ctx3, pA, 450);
-                    schedulePointReveal(ctx3, pB, 750);
-                    scheduleLineReveal(ctx3, line, 1100);
-                } else if (type === 'ax3') {
-                    const plane1 = addPlane(ctx3, 5, colors.plane, 0.28);
-
-                    const plane2Group = new THREE.Group();
-                    const plane2Material = new THREE.MeshStandardMaterial({
-                        color: colors.plane2,
-                        side: THREE.DoubleSide,
-                        transparent: true,
-                        opacity: 0.4,
-                        depthWrite: false
-                    });
-                    const plane2 = new THREE.Mesh(new THREE.PlaneGeometry(5, 5), plane2Material);
-                    plane2.rotation.y = Math.PI / 4;
-                    plane2Group.add(plane2);
-                    plane2Group.userData.planeMaterial = plane2Material;
-                    ctx3.scene.add(plane2Group);
-
-                    const intersection = addLine(ctx3, new THREE.Vector3(-2.5, 0, 2.5), new THREE.Vector3(2.5, 0, -2.5), colors.highlight, 0.05);
-
-                    schedulePlaneReveal(ctx3, plane1, 0, 900);
-                    schedulePlaneReveal(ctx3, plane2Group, 550, 900);
-                    scheduleLineReveal(ctx3, intersection, 1400, 750);
-                } else if (type === 'ax4') {
-                    const plane = addPlane(ctx3, 5);
-                    const l1 = addLine(ctx3, new THREE.Vector3(0, 0, -1), new THREE.Vector3(-1.5, 0, 1.5), colors.plane2);
-                    const l2 = addLine(ctx3, new THREE.Vector3(-1.5, 0, 1.5), new THREE.Vector3(1.5, 0, 1.5), colors.plane2);
-                    const l3 = addLine(ctx3, new THREE.Vector3(1.5, 0, 1.5), new THREE.Vector3(0, 0, -1), colors.plane2);
-                    schedulePlaneReveal(ctx3, plane, 0);
-                    scheduleLineReveal(ctx3, l1, 500);
-                    scheduleLineReveal(ctx3, l2, 850);
-                    scheduleLineReveal(ctx3, l3, 1200);
-                }
-            }
-
-            buildAxioms('ax1');
-            document.querySelectorAll('input[name="axiomType"]').forEach(radio =>
-                radio.addEventListener('change', (e) => buildAxioms(e.target.value))
-            );
-
-            // Scene 4: plane definition
-            const ctx4 = createSceneContext('plane-def-canvas');
-            ctx4.camera.position.set(4, 4, 4);
-
-            function buildPlaneDef(type) {
-                resetScene(ctx4);
-
-                if (type === 'pd1') {
-                    const pA = addPoint(ctx4, 1, 0, 1);
-                    const pB = addPoint(ctx4, -1, 0, -1);
-                    const pC = addPoint(ctx4, 1, 0, -1);
-                    const plane = addPlane(ctx4, 5);
-                    schedulePointReveal(ctx4, pA, 0);
-                    schedulePointReveal(ctx4, pB, 300);
-                    schedulePointReveal(ctx4, pC, 600);
-                    schedulePlaneReveal(ctx4, plane, 950);
-                } else if (type === 'pd2') {
-                    const line = addLine(ctx4, new THREE.Vector3(-2, 0, 1), new THREE.Vector3(2, 0, 1));
-                    const point = addPoint(ctx4, 0, 0, -1);
-                    const plane = addPlane(ctx4, 5);
-                    scheduleLineReveal(ctx4, line, 0);
-                    schedulePointReveal(ctx4, point, 550);
-                    schedulePlaneReveal(ctx4, plane, 1000);
-                } else if (type === 'pd3') {
-                    const l1 = addLine(ctx4, new THREE.Vector3(-2, 0, -2), new THREE.Vector3(2, 0, 2));
-                    const l2 = addLine(ctx4, new THREE.Vector3(-2, 0, 2), new THREE.Vector3(2, 0, -2));
-                    const plane = addPlane(ctx4, 5);
-                    scheduleLineReveal(ctx4, l1, 0);
-                    scheduleLineReveal(ctx4, l2, 500);
-                    schedulePlaneReveal(ctx4, plane, 1000);
-                } else if (type === 'pd4') {
-                    const l1 = addLine(ctx4, new THREE.Vector3(-2, 0, -1), new THREE.Vector3(2, 0, -1));
-                    const l2 = addLine(ctx4, new THREE.Vector3(-2, 0, 1), new THREE.Vector3(2, 0, 1));
-                    const plane = addPlane(ctx4, 5);
-                    scheduleLineReveal(ctx4, l1, 0);
-                    scheduleLineReveal(ctx4, l2, 500);
-                    schedulePlaneReveal(ctx4, plane, 1000);
-                }
-            }
-
-            buildPlaneDef('pd1');
-            document.querySelectorAll('input[name="planeDefType"]').forEach(radio =>
-                radio.addEventListener('change', (e) => buildPlaneDef(e.target.value))
-            );
-
-            // Scene 5: positions of two lines
-            const ctx5 = createSceneContext('position-canvas');
-            ctx5.camera.position.set(4, 4, 4);
-
-            function buildPosition(type) {
-                resetScene(ctx5);
-
-                if (type === 'intersecting') {
-                    const plane = addPlane(ctx5, 5);
-                    const l1 = addLine(ctx5, new THREE.Vector3(-2, 0, -2), new THREE.Vector3(2, 0, 2));
-                    const l2 = addLine(ctx5, new THREE.Vector3(-2, 0, 2), new THREE.Vector3(2, 0, -2));
-                    const point = addPoint(ctx5, 0, 0, 0, colors.highlight, 0.15);
-                    schedulePlaneReveal(ctx5, plane, 0);
-                    scheduleLineReveal(ctx5, l1, 500);
-                    scheduleLineReveal(ctx5, l2, 950);
-                    schedulePointReveal(ctx5, point, 1500);
-                } else if (type === 'parallel') {
-                    const plane = addPlane(ctx5, 5);
-                    const l1 = addLine(ctx5, new THREE.Vector3(-2, 0, -1), new THREE.Vector3(2, 0, -1));
-                    const l2 = addLine(ctx5, new THREE.Vector3(-2, 0, 1), new THREE.Vector3(2, 0, 1));
-                    schedulePlaneReveal(ctx5, plane, 0);
-                    scheduleLineReveal(ctx5, l1, 550);
-                    scheduleLineReveal(ctx5, l2, 1000);
-                } else if (type === 'skew') {
-                    const plane = addPlane(ctx5, 5);
-                    const l1 = addLine(ctx5, new THREE.Vector3(-2, 0, 0), new THREE.Vector3(2, 0, 0));
-                    const l2 = addLine(ctx5, new THREE.Vector3(0, 2, -2), new THREE.Vector3(0, 2, 2), colors.plane2);
-                    schedulePlaneReveal(ctx5, plane, 0);
-                    scheduleLineReveal(ctx5, l1, 550);
-                    scheduleLineReveal(ctx5, l2, 1050);
-                }
-            }
-
-            buildPosition('parallel');
-            document.querySelectorAll('input[name="linePosition"]').forEach(radio =>
-                radio.addEventListener('change', (e) => buildPosition(e.target.value))
-            );
-
-            // Scene 6: parallel line theorems
-            const ctx6 = createSceneContext('parallel-canvas');
-            ctx6.camera.position.set(4, 4, 4);
-
-            function buildParallelThm(type) {
-                resetScene(ctx6);
-
-                if (type === 'th1') {
-                    const baseLine = addLine(ctx6, new THREE.Vector3(-2, 0, -1), new THREE.Vector3(2, 0, -1));
-                    const point = addPoint(ctx6, 0, 1.5, 1, colors.point);
-                    const parallelLine = addLine(ctx6, new THREE.Vector3(-2, 1.5, 1), new THREE.Vector3(2, 1.5, 1), colors.highlight);
-                    scheduleLineReveal(ctx6, baseLine, 0);
-                    schedulePointReveal(ctx6, point, 550);
-                    scheduleLineReveal(ctx6, parallelLine, 950);
-                } else if (type === 'th2') {
-                    const l1 = addLine(ctx6, new THREE.Vector3(-2, 0, -1.5), new THREE.Vector3(2, 0, -1.5), colors.line);
-                    const l2 = addLine(ctx6, new THREE.Vector3(-2, 0, 1.5), new THREE.Vector3(2, 0, 1.5), colors.line);
-                    const l3 = addLine(ctx6, new THREE.Vector3(-2, 1.5, 0), new THREE.Vector3(2, 1.5, 0), colors.highlight);
-                    scheduleLineReveal(ctx6, l1, 0);
-                    scheduleLineReveal(ctx6, l2, 450);
-                    scheduleLineReveal(ctx6, l3, 900);
-                }
-            }
-
-            buildParallelThm('th1');
-            document.querySelectorAll('input[name="parallelThm"]').forEach(radio =>
-                radio.addEventListener('change', (e) => buildParallelThm(e.target.value))
-            );
-
-            // Scene 7: angle between skew lines
-            const ctx7 = createSceneContext('skew-angle-canvas');
-            ctx7.camera.position.set(5, 5, 6);
-            ctx7.controls.autoRotate = false;
-
-            function buildSkewAngle(step) {
-                resetScene(ctx7);
-
-                const pA1 = new THREE.Vector3(-3, 0, 0);
-                const pA2 = new THREE.Vector3(3, 0, 0);
-                const lineA = addLine(ctx7, pA1, pA2, colors.line);
-
-                const bDir = new THREE.Vector3(1, 0, 1.5).normalize();
-                const bCenter = new THREE.Vector3(0, 2.5, -1);
-                const pB1 = bCenter.clone().add(bDir.clone().multiplyScalar(-3));
-                const pB2 = bCenter.clone().add(bDir.clone().multiplyScalar(3));
-                const lineB = addLine(ctx7, pB1, pB2, colors.plane2);
-
-                if (step === 'step1') {
-                    scheduleLineReveal(ctx7, lineA, 0);
-                    scheduleLineReveal(ctx7, lineB, 500);
-                    return;
-                }
-
-                const pointM = addPoint(ctx7, 0, 0, 0, colors.highlight, 0.2);
-
-                if (step === 'step2') {
-                    schedulePointReveal(ctx7, pointM, 250);
-                    return;
-                }
-
-                const pBprime1 = new THREE.Vector3(0, 0, 0).add(bDir.clone().multiplyScalar(-3));
-                const pBprime2 = new THREE.Vector3(0, 0, 0).add(bDir.clone().multiplyScalar(3));
-                const lineBPrime = addLine(ctx7, pBprime1, pBprime2, colors.plane2, 0.015);
-                const plane = addPlane(ctx7, 6, colors.plane, 0.15);
-
-                if (step === 'step3') {
-                    scheduleLineReveal(ctx7, lineBPrime, 250);
-                    schedulePlaneReveal(ctx7, plane, 950, 850);
-                    return;
-                }
-
-                if (plane.userData?.planeMaterial) plane.userData.planeMaterial.opacity = 0.15;
-                if (plane.userData?.gridMaterial) plane.userData.gridMaterial.opacity = 0.2;
-
-                const angle = Math.atan2(bDir.z, bDir.x);
-                const angleGeometry = new THREE.CircleGeometry(0.62, 40, 0, angle);
-                const angleMaterial = new THREE.MeshBasicMaterial({
-                    color: colors.highlight,
-                    side: THREE.DoubleSide,
-                    transparent: true,
-                    opacity: 0,
-                    depthTest: false
-                });
-                const angleMesh = new THREE.Mesh(angleGeometry, angleMaterial);
-                angleMesh.rotation.x = Math.PI / 2;
-                angleMesh.position.set(0, 0.02, 0);
-                angleMesh.scale.set(0.001, 0.001, 0.001);
-                angleMesh.renderOrder = 9;
-                ctx7.scene.add(angleMesh);
-
-                const arcRadius = 0.62;
-                const arcPoints = [];
-                const arcSegments = 40;
-                for (let i = 0; i <= arcSegments; i++) {
-                    const t = angle * (i / arcSegments);
-                    arcPoints.push(new THREE.Vector3(arcRadius * Math.cos(t), 0, arcRadius * Math.sin(t)));
-                }
-                const arcGeometry = new THREE.BufferGeometry().setFromPoints(arcPoints);
-                const arcMaterial = new THREE.LineBasicMaterial({
-                    color: 0xfff3a3,
-                    transparent: true,
-                    opacity: 0,
-                    depthTest: false
-                });
-                const angleArc = new THREE.Line(arcGeometry, arcMaterial);
-                angleArc.position.set(0, 0.03, 0);
-                angleArc.scale.set(0.001, 0.001, 0.001);
-                angleArc.renderOrder = 10;
-                ctx7.scene.add(angleArc);
-
-                ctx7.revealAnimations.push({
-                    type: 'point',
-                    mesh: angleMesh,
-                    delay: 250,
-                    duration: 650,
-                    start: performance.now()
-                });
-                ctx7.revealAnimations.push({
-                    type: 'custom-angle-opacity',
-                    mesh: angleMesh,
-                    material: angleMaterial,
-                    maxOpacity: 0.68,
-                    delay: 250,
-                    duration: 650,
-                    start: performance.now()
-                });
-                ctx7.revealAnimations.push({
-                    type: 'point',
-                    mesh: angleArc,
-                    delay: 250,
-                    duration: 650,
-                    start: performance.now()
-                });
-                ctx7.revealAnimations.push({
-                    type: 'custom-angle-opacity',
-                    mesh: angleArc,
-                    material: arcMaterial,
-                    maxOpacity: 1,
-                    delay: 250,
-                    duration: 650,
-                    start: performance.now()
-                });
-            }
-
-            buildSkewAngle('step1');
-            document.querySelectorAll('input[name="skewAngleStep"]').forEach(radio =>
-                radio.addEventListener('change', (e) => buildSkewAngle(e.target.value))
-            );
-
-            function animate() {
-                requestAnimationFrame(animate);
-                const now = performance.now();
-                scenesData.forEach(ctx => {
-                    updateRevealAnimations(ctx, now);
-                    ctx.controls.update();
-                    ctx.renderer.render(ctx.scene, ctx.camera);
-                });
-            }
-            animate();
-
-            window.addEventListener('resize', () => {
-                scenesData.forEach(ctx => {
-                    const width = ctx.container.clientWidth;
-                    const height = ctx.container.clientHeight;
-                    ctx.renderer.setSize(width, height);
-                    ctx.camera.aspect = width / height;
-                    ctx.camera.updateProjectionMatrix();
-                });
-            });
-        }
     </script>
 </body>
 </html>
